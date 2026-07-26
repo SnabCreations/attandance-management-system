@@ -82,7 +82,7 @@ export default async function ParentPortalPage() {
                 <h2 className={styles.childName}>{child.name}</h2>
                 <p className={styles.childInfo}>
                   Roll No: <strong>{child.roll_no}</strong> | 
-                  Batch: {child.semesters?.departments?.name} - {child.semesters?.name}
+                  Batch: {(child.semesters as any)?.departments?.name} - {(child.semesters as any)?.name}
                 </p>
               </div>
             </div>

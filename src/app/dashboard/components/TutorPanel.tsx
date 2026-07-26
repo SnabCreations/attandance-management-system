@@ -45,7 +45,7 @@ export default async function TutorPanel({ userId }: { userId: string }) {
               <li key={sem.id} className={styles.listItem}>
                 <div>
                   <span className={styles.itemTitle}>{sem.name}</span>
-                  <div className={styles.itemSubtitle}>{sem.departments?.name}</div>
+                  <div className={styles.itemSubtitle}>{(sem.departments as any)?.name}</div>
                 </div>
               </li>
             ))}

@@ -24,8 +24,8 @@ export default async function AttendancePage() {
   const { createAdminClient } = await import('@/utils/supabase/admin')
   const adminClient = createAdminClient()
 
-  let assignments = []
-  let semesterIds = []
+  let assignments: any[] = []
+  let semesterIds: any[] = []
 
   if (isAdmin) {
     const { data: allSubjects } = await adminClient
@@ -60,7 +60,7 @@ export default async function AttendancePage() {
           return {
             subject_id: s.id,
             semester_id: s.semester_id,
-            subjects: { name: `${sem?.departments?.name || ''} - ${sem?.name || ''}: ${s.name}` }
+            subjects: { name: `${(sem as any)?.departments?.name || ''} - ${(sem as any)?.name || ''}: ${s.name}` }
           }
         })
         semesterIds = semIds

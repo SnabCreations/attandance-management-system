@@ -17,7 +17,7 @@ export default async function FacultyPanel({ userId }: { userId: string }) {
 
   const subjectIds = assignments?.map(a => a.subject_id) || []
   
-  let activeAssignments = []
+  let activeAssignments: any[] = []
   if (subjectIds.length > 0) {
     const { data: recentAssignments } = await adminClient
       .from('assignments')

@@ -12,7 +12,7 @@ export default async function ParentPanel({ userId }: { userId: string }) {
 
   const studentIds = students?.map(s => s.id) || []
   
-  let latestAssignments = []
+  let latestAssignments: any[] = []
   if (studentIds.length > 0) {
     const { data: assignments } = await adminClient
       .from('student_assignments')
@@ -44,7 +44,7 @@ export default async function ParentPanel({ userId }: { userId: string }) {
             <h3 className={styles.statTitle}>{student.roll_no}</h3>
             <p className={styles.statNumber} style={{ fontSize: '1.5rem', marginTop: '0.25rem' }}>{student.name}</p>
             <p className={styles.itemSubtitle} style={{ marginTop: '0.5rem' }}>
-              {student.semesters?.departments?.name} - {student.semesters?.name}
+              {(student.semesters as any)?.departments?.name} - {(student.semesters as any)?.name}
             </p>
           </div>
         ))}
