@@ -1,5 +1,6 @@
 import { login } from './actions'
 import styles from './login.module.css'
+import { SubmitButton } from './SubmitButton'
 
 export default async function LoginPage({
   searchParams,
@@ -14,7 +15,7 @@ export default async function LoginPage({
         <h1 className={styles.title}>Welcome Back</h1>
         <p className={styles.subtitle}>Academic Management System</p>
         
-        <form className={styles.form}>
+        <form action={login} className={styles.form}>
           <div className={styles.inputGroup}>
             <label htmlFor="email">Email Address</label>
             <input 
@@ -41,9 +42,7 @@ export default async function LoginPage({
             <p className={styles.error}>{resolvedParams.error}</p>
           )}
 
-          <button formAction={login} className={styles.button}>
-            Log In
-          </button>
+          <SubmitButton />
         </form>
       </div>
     </div>

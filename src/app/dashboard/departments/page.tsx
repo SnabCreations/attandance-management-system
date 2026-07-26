@@ -12,7 +12,7 @@ export default async function DepartmentsPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.card}>
+      {/* <div className={styles.card}>
         <h2>Add New Department</h2>
         <form action={addDepartment} className={styles.form}>
           <div className={styles.inputGroup}>
@@ -29,7 +29,7 @@ export default async function DepartmentsPage() {
             Create Department
           </button>
         </form>
-      </div>
+      </div> */}
 
       <div className={styles.card}>
         <h2>Existing Departments</h2>

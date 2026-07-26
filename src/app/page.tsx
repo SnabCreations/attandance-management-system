@@ -9,7 +9,7 @@ export default function LandingPage() {
           <img 
             src="https://carmelpoly.in/_next/image?url=%2Fmainlogo.png&w=2048&q=75" 
             alt="Carmel Logo" 
-            className="h-8 object-contain"
+            className="h-8 w-auto object-contain"
           />
           <span className="font-bold text-xl text-slate-800 hidden sm:block">Carmel AMS</span>
         </div>
@@ -36,7 +36,7 @@ export default function LandingPage() {
             <img 
               src="https://carmelpoly.in/_next/image?url=%2Fmainlogo.png&w=2048&q=75" 
               alt="Carmel Logo" 
-              className="h-16 md:h-20 object-contain"
+              className="h-12 md:h-16 w-auto object-contain"
             />
           </div>
           
