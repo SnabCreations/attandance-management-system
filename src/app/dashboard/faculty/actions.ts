@@ -42,3 +42,26 @@ export async function assignFaculty(formData: FormData) {
   
   revalidatePath('/dashboard/faculty')
 }
+
+export async function deleteAssignment(assignment_id: string) {
+  const supabase = await createClient()
+  
+  // Verify caller is an Admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  
+  const { data: callerProfile } = await supabase
+    .from('users')
+    .select('roles')
+    .eq('id', user.id)
+    .single()
+    
+  if (!callerProfile?.roles?.includes('Admin')) return
+
+  const { createAdminClient } = await import('@/utils/supabase/admin')
+  const adminClient = createAdminClient()
+  
+  await adminClient.from('faculty_subjects').delete().eq('id', assignment_id)
+  
+  revalidatePath('/dashboard/faculty')
+}

@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/utils/supabase/admin'
 import styles from '../page.module.css'
-import { UserCircle2 } from 'lucide-react'
+import { UserCircle2, CalendarDays } from 'lucide-react'
 
 export default async function ParentPanel({ userId }: { userId: string }) {
   const adminClient = createAdminClient()
@@ -13,7 +13,10 @@ export default async function ParentPanel({ userId }: { userId: string }) {
   const studentIds = students?.map(s => s.id) || []
   
   let latestAssignments: any[] = []
+  let recentAttendance: any[] = []
+  
   if (studentIds.length > 0) {
+    // Fetch assignments
     const { data: assignments } = await adminClient
       .from('student_assignments')
       .select('id, status, marks, assignments(title, due_date, subjects(name)), students(name)')
@@ -22,7 +25,6 @@ export default async function ParentPanel({ userId }: { userId: string }) {
       .limit(10)
       
     if (assignments) {
-      // Sort so 'Pending' is on top, then by due_date desc
       latestAssignments = assignments.sort((a: any, b: any) => {
         if (a.status === 'Pending' && b.status !== 'Pending') return -1
         if (a.status !== 'Pending' && b.status === 'Pending') return 1
@@ -32,7 +34,29 @@ export default async function ParentPanel({ userId }: { userId: string }) {
         return dateB - dateA
       })
     }
+
+    // Fetch attendance for the last 7 days
+    const lastWeek = new Date()
+    lastWeek.setDate(lastWeek.getDate() - 7)
+    
+    const { data: attendanceData } = await adminClient
+      .from('attendance')
+      .select('id, date, status, hours, subjects(name), students(name)')
+      .in('student_id', studentIds)
+      .gte('date', lastWeek.toISOString().split('T')[0])
+      .order('date', { ascending: false })
+      
+    recentAttendance = attendanceData || []
   }
+
+  // Group attendance by date
+  const attendanceByDate = recentAttendance.reduce((acc: any, record: any) => {
+    if (!acc[record.date]) {
+      acc[record.date] = []
+    }
+    acc[record.date].push(record)
+    return acc
+  }, {})
 
   return (
     <div className={styles.dashboardSection}>
@@ -54,9 +78,40 @@ export default async function ParentPanel({ userId }: { userId: string }) {
           </div>
         )}
       </div>
+
+      {studentIds.length > 0 && (
+        <div className={styles.fullWidthCard} style={{ marginTop: '2rem' }}>
+          <h3 className={styles.statTitle} style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <CalendarDays size={20} /> Weekly Attendance View
+          </h3>
+          
+          <div className={styles.calendarGrid}>
+            {Object.keys(attendanceByDate).length > 0 ? (
+              Object.keys(attendanceByDate).map(dateStr => (
+                <div key={dateStr} className={styles.calendarDayCard}>
+                  <div className={styles.calendarDayHeader}>
+                    {new Date(dateStr).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                  </div>
+                  <div className={styles.calendarDayBody}>
+                    {attendanceByDate[dateStr].map((record: any) => (
+                      <div key={record.id} className={`${styles.attendanceHour} ${record.status === 'Present' ? styles.hourPresent : styles.hourAbsent}`}>
+                        <span className={styles.hourSubject}>{record.subjects?.name}</span>
+                        <span className={styles.hourStatus}>{record.status} ({record.hours} hr)</span>
+                        <span className={styles.hourStudent}>{record.students?.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className={styles.itemSubtitle}>No attendance records in the last 7 days.</p>
+            )}
+          </div>
+        </div>
+      )}
       
       {latestAssignments.length > 0 && (
-        <div className={styles.fullWidthCard}>
+        <div className={styles.fullWidthCard} style={{ marginTop: '2rem' }}>
           <h3 className={styles.statTitle} style={{ marginBottom: '1rem' }}>Latest Assignments</h3>
           <ul className={styles.list}>
             {latestAssignments.map((sa: any) => (

@@ -26,6 +26,27 @@ export async function addSemester(formData: FormData) {
   revalidatePath('/dashboard/semesters')
 }
 
+export async function bulkAddSemesters(data: any[], department_id: number) {
+  const supabase = await createClient()
+  
+  if (!department_id || !data || data.length === 0) return { error: 'Invalid data' }
+  
+  const inserts = data.map(row => ({
+    name: row['Name'] || row['name'] || '',
+    department_id
+  })).filter(s => s.name)
+  
+  const { error } = await supabase.from('semesters').insert(inserts)
+  
+  if (error) {
+    console.error('Error in bulkAddSemesters:', error)
+    return { error: error.message }
+  }
+  
+  revalidatePath('/dashboard/semesters')
+  return { count: inserts.length }
+}
+
 export async function promoteSemester(formData: FormData) {
   const supabase = await createClient()
   

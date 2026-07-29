@@ -129,3 +129,57 @@
   padding: 2rem;
   overflow-y: auto;
 }
+
+.topbar {
+  display: none;
+}
+
+.mobileMenuBtn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: #1e293b;
+}
+
+.topbarTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+.mobileOverlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .mobileMenuBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobileOverlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 5;
+  }
+  
+  .sidebar {
+    transition: transform 0.3s ease;
+  }
+}

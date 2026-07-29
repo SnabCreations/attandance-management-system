@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import styles from './students.module.css'
-import { addStudent } from './actions'
+import StudentRegistryForm from './StudentRegistryForm'
+import { deleteStudent } from './actions'
 
 export default async function StudentRegistryPage() {
   const supabase = await createClient()
@@ -21,15 +22,6 @@ export default async function StudentRegistryPage() {
   }
 
   const { data: semesters } = await semesterQuery
-
-  const { createAdminClient } = await import('@/utils/supabase/admin')
-  const adminClient = createAdminClient()
-
-  const { data: parents } = await adminClient
-    .from('users')
-    .select('id, email')
-    .contains('roles', ['Parent'])
-    .order('email')
 
   let studentsQuery = supabase
     .from('students')
@@ -61,62 +53,7 @@ export default async function StudentRegistryPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.card}>
-        <h2>Register New Student</h2>
-        <form action={addStudent} className={styles.form}>
-          <div className={styles.gridForm}>
-            <div className={styles.inputGroup}>
-              <label htmlFor="name">Full Name</label>
-              <input 
-                id="name" 
-                name="name" 
-                type="text" 
-                placeholder="e.g. John Doe" 
-                required 
-              />
-            </div>
-            
-            <div className={styles.inputGroup}>
-              <label htmlFor="roll_no">Roll Number</label>
-              <input 
-                id="roll_no" 
-                name="roll_no" 
-                type="text" 
-                placeholder="e.g. CS24001" 
-                required 
-              />
-            </div>
-
-            <div className={styles.inputGroup}>
-              <label htmlFor="semester_id">Semester & Department</label>
-              <select id="semester_id" name="semester_id" required className={styles.select}>
-                <option value="">Select a Semester...</option>
-                {semesters?.map((sem: any) => (
-                  <option key={sem.id} value={`${sem.id}_${sem.department_id}`}>
-                    {sem.departments?.name} - {sem.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className={styles.inputGroup}>
-              <label htmlFor="parent_id">Link Parent Account (Optional)</label>
-              <select id="parent_id" name="parent_id" className={styles.select}>
-                <option value="">No Parent Linked</option>
-                {parents?.map((parent) => (
-                  <option key={parent.id} value={parent.id}>
-                    {parent.email}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          
-          <button type="submit" className={styles.button}>
-            Add Student
-          </button>
-        </form>
-      </div>
+      <StudentRegistryForm semesters={semesters || []} />
 
       <div className={styles.card}>
         <h2>Student Registry</h2>
@@ -128,6 +65,7 @@ export default async function StudentRegistryPage() {
                 <th>Name</th>
                 <th>Department / Semester</th>
                 <th>Parent Linked</th>
+                {isAdmin && <th>Actions</th>}
               </tr>
             </thead>
             <tbody>
@@ -147,6 +85,18 @@ export default async function StudentRegistryPage() {
                       <span className={styles.statusPending}>Pending</span>
                     )}
                   </td>
+                  {isAdmin && (
+                    <td>
+                      <form action={async () => {
+                        'use server'
+                        await deleteStudent(student.id)
+                      }}>
+                        <button type="submit" className={styles.deleteBtn}>
+                          Delete
+                        </button>
+                      </form>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

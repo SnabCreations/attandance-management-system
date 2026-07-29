@@ -115,3 +115,39 @@
   color: #6b7280;
   font-style: italic;
 }
+
+.groupsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.facultyGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.facultyTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #2563eb;
+  margin: 0;
+  border-bottom: 2px solid rgba(37, 99, 235, 0.1);
+  padding-bottom: 0.5rem;
+}
+
+.deleteBtn {
+  background-color: transparent;
+  color: #ef4444;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.deleteBtn:hover {
+  background-color: #fef2f2;
+}

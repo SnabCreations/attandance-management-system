@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/utils/supabase/admin'
 import Link from 'next/link'
 import styles from '../page.module.css'
-import { GraduationCap, ClipboardCheck, FileText } from 'lucide-react'
+import { GraduationCap, ClipboardCheck, FileText, Clock } from 'lucide-react'
 
 export default async function FacultyPanel({ userId }: { userId: string }) {
   const adminClient = createAdminClient()
@@ -28,6 +28,22 @@ export default async function FacultyPanel({ userId }: { userId: string }) {
     activeAssignments = recentAssignments || []
   }
 
+  // Get current day of week (1 = Monday, 7 = Sunday)
+  let today = new Date().getDay()
+  if (today === 0) today = 7
+
+  const { data: upcomingClasses } = await adminClient
+    .from('timetables')
+    .select(`
+      id,
+      hour_slot,
+      subjects(name, code),
+      semesters(name, departments(name))
+    `)
+    .eq('faculty_id', userId)
+    .eq('day_of_week', today)
+    .order('hour_slot', { ascending: true })
+
   return (
     <div className={styles.dashboardSection}>
       <h2 className={styles.sectionTitle}><GraduationCap size={24} /> Faculty Overview</h2>
@@ -39,8 +55,29 @@ export default async function FacultyPanel({ userId }: { userId: string }) {
         </div>
       </div>
       
+      {upcomingClasses && upcomingClasses.length > 0 && (
+        <div className={styles.fullWidthCard} style={{ marginTop: '2rem' }}>
+          <h3 className={styles.statTitle} style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Clock size={18} /> Today's Classes
+          </h3>
+          <ul className={styles.list}>
+            {upcomingClasses.map((cls: any) => (
+              <li key={cls.id} className={styles.listItem}>
+                <div>
+                  <span className={styles.itemTitle}>Hour {cls.hour_slot}</span>
+                  <div className={styles.itemSubtitle}>{cls.subjects?.name || (Array.isArray(cls.subjects) ? cls.subjects[0]?.name : '')} ({cls.subjects?.code || (Array.isArray(cls.subjects) ? cls.subjects[0]?.code : '')})</div>
+                </div>
+                <span className={styles.badge}>
+                  {(cls.semesters?.departments?.name || (Array.isArray(cls.semesters?.departments) ? cls.semesters.departments[0]?.name : ''))} / {cls.semesters?.name || (Array.isArray(cls.semesters) ? cls.semesters[0]?.name : '')}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {activeAssignments.length > 0 && (
-        <div className={styles.fullWidthCard}>
+        <div className={styles.fullWidthCard} style={{ marginTop: '2rem' }}>
           <h3 className={styles.statTitle} style={{ marginBottom: '1rem' }}>Recent Assignments Created</h3>
           <ul className={styles.list}>
             {activeAssignments.map(a => (

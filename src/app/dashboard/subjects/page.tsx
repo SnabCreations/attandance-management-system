@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import styles from './subjects.module.css'
 import { addSubject } from './actions'
+import BulkSubjectUpload from './BulkSubjectUpload'
 
 export default async function SubjectsPage() {
   const supabase = await createClient()
@@ -17,62 +18,90 @@ export default async function SubjectsPage() {
     .select(`
       *,
       semesters (
+        id,
         name,
         departments (name)
       )
     `)
     .order('id')
 
+  // Group subjects by semester
+  const groupedSubjects = subjects?.reduce((acc: any, sub: any) => {
+    const semKey = `${sub.semesters?.departments?.name} - ${sub.semesters?.name}`
+    if (!acc[semKey]) {
+      acc[semKey] = []
+    }
+    acc[semKey].push(sub)
+    return acc
+  }, {})
+
   return (
     <div className={styles.container}>
       <div className={styles.card}>
         <h2>Add New Subject</h2>
         <form action={addSubject} className={styles.form}>
-          <div className={styles.inputGroup}>
-            <label htmlFor="name">Subject Name</label>
-            <input 
-              id="name" 
-              name="name" 
-              type="text" 
-              placeholder="e.g. Database Systems" 
-              required 
-            />
-          </div>
-          
-          <div className={styles.inputGroup}>
-            <label htmlFor="semester_id">Semester</label>
-            <select id="semester_id" name="semester_id" required className={styles.select}>
-              <option value="">Select a Semester...</option>
-              {semesters?.map((sem: any) => (
-                <option key={sem.id} value={sem.id}>
-                  {sem.departments?.name} - {sem.name}
-                </option>
-              ))}
-            </select>
+          <div className={styles.gridForm}>
+            <div className={styles.inputGroup}>
+              <label htmlFor="code">Subject Code</label>
+              <input 
+                id="code" 
+                name="code" 
+                type="text" 
+                placeholder="e.g. CS101" 
+                required 
+              />
+            </div>
+            <div className={styles.inputGroup}>
+              <label htmlFor="name">Subject Name</label>
+              <input 
+                id="name" 
+                name="name" 
+                type="text" 
+                placeholder="e.g. Database Systems" 
+                required 
+              />
+            </div>
+            
+            <div className={styles.inputGroup} style={{ gridColumn: '1 / -1' }}>
+              <label htmlFor="semester_id">Semester</label>
+              <select id="semester_id" name="semester_id" required className={styles.select}>
+                <option value="">Select a Semester...</option>
+                {semesters?.map((sem: any) => (
+                  <option key={sem.id} value={sem.id}>
+                    {sem.departments?.name} - {sem.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           
           <button type="submit" className={styles.button}>
             Create Subject
           </button>
         </form>
+        <BulkSubjectUpload semesters={semesters || []} />
       </div>
 
       <div className={styles.card}>
-        <h2>Existing Subjects</h2>
-        {subjects && subjects.length > 0 ? (
-          <ul className={styles.list}>
-            {subjects.map((sub: any) => (
-              <li key={sub.id} className={styles.listItem}>
-                <div className={styles.subInfo}>
-                  <span className={styles.subName}>{sub.name}</span>
-                  <span className={styles.badge}>
-                    {sub.semesters?.departments?.name} / {sub.semesters?.name}
-                  </span>
-                </div>
-                <span className={styles.subId}>ID: {sub.id}</span>
-              </li>
+        <h2>Existing Subjects (Grouped by Semester)</h2>
+        {groupedSubjects && Object.keys(groupedSubjects).length > 0 ? (
+          <div className={styles.groupsContainer}>
+            {Object.keys(groupedSubjects).map(semesterName => (
+              <div key={semesterName} className={styles.semesterGroup}>
+                <h3 className={styles.semesterTitle}>{semesterName}</h3>
+                <ul className={styles.list}>
+                  {groupedSubjects[semesterName].map((sub: any) => (
+                    <li key={sub.id} className={styles.listItem}>
+                      <div className={styles.subInfo}>
+                        <span className={styles.subCode}>{sub.code || `SUB-${sub.id}`}</span>
+                        <span className={styles.subName}>{sub.name}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
         ) : (
           <p className={styles.emptyState}>No subjects found. Add one above!</p>
         )}

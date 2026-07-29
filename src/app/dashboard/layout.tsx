@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
+import DashboardShell from './DashboardShell'
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -30,9 +32,8 @@ export default async function DashboardLayout({
 
   const roles = userProfile?.roles || ['Unassigned']
   
-  return (
-    <div className={styles.layout}>
-      <aside className={styles.sidebar}>
+  const sidebarContent = (
+    <>
         <div className={styles.sidebarHeader}>
           <h2>Carmel AMS</h2>
           <span className={styles.roleBadge}>{roles.join(', ')}</span>
@@ -47,12 +48,14 @@ export default async function DashboardLayout({
             <>
               <div className={styles.navSection}>System Administration</div>
               <Link href="/dashboard/users" className={styles.navLink}>User Accounts</Link>
+              <Link href="/dashboard/announcements" className={styles.navLink}>Announcements</Link>
               <Link href="/dashboard/faculty/attendance" className={styles.navLink}>Fallback Attendance</Link>
               
               <div className={styles.navSection}>Academic Setup</div>
               <Link href="/dashboard/departments" className={styles.navLink}>Departments</Link>
               <Link href="/dashboard/semesters" className={styles.navLink}>Semesters</Link>
               <Link href="/dashboard/subjects" className={styles.navLink}>Subjects</Link>
+              <Link href="/dashboard/timetables" className={styles.navLink}>Timetables</Link>
               <Link href="/dashboard/faculty" className={styles.navLink}>Faculty Management</Link>
               
               <div className={styles.navSection}>System Overview</div>
@@ -64,6 +67,8 @@ export default async function DashboardLayout({
             <>
               <div className={styles.navSection}>Class Management</div>
               <Link href="/dashboard/tutor/students" className={styles.navLink}>Student Registry</Link>
+              <Link href="/dashboard/timetables" className={styles.navLink}>Timetables</Link>
+              <Link href="/dashboard/announcements" className={styles.navLink}>Announcements</Link>
               <Link href="/dashboard/faculty/attendance" className={styles.navLink}>Log Attendance</Link>
               <Link href="/dashboard/tutor/oversight" className={styles.navLink}>Class Oversight</Link>
               
@@ -75,6 +80,7 @@ export default async function DashboardLayout({
           {roles.includes('Faculty') && (
             <>
               <div className={styles.navSection}>Teaching</div>
+              <Link href="/dashboard/announcements" className={styles.navLink}>Announcements</Link>
               <Link href="/dashboard/faculty/attendance" className={styles.navLink}>Log Attendance</Link>
               <Link href="/dashboard/faculty/assignments" className={styles.navLink}>Assignments</Link>
             </>
@@ -84,6 +90,7 @@ export default async function DashboardLayout({
             <>
               <div className={styles.navSection}>My Child</div>
               <Link href="/dashboard/parent" className={styles.navLink}>Performance</Link>
+              <Link href="/dashboard/announcements" className={styles.navLink}>Announcements</Link>
             </>
           )}
         </nav>
@@ -96,16 +103,12 @@ export default async function DashboardLayout({
             </button>
           </form>
         </div>
-      </aside>
+    </>
+  )
 
-      <main className={styles.mainContent}>
-        <header className={styles.topbar}>
-          {/* Topbar content could go here (e.g. mobile toggle) */}
-        </header>
-        <div className={styles.pageContent}>
-          {children}
-        </div>
-      </main>
-    </div>
+  return (
+    <DashboardShell sidebarContent={sidebarContent}>
+      {children}
+    </DashboardShell>
   )
 }

@@ -1,0 +1,82 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.table th, .table td {
+  border: 1px solid var(--border-color);
+  padding: 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  background-color: var(--bg-canvas);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.dayLabel {
+  font-weight: 600;
+  color: var(--text-primary);
+  background-color: var(--bg-canvas);
+  width: 100px;
+}
+
+.cellForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.selectSmall {
+  padding: 0.25rem;
+  font-size: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: #fff;
+  width: 100%;
+}
+
+.saveBtn {
+  padding: 0.25rem;
+  font-size: 0.7rem;
+  background-color: var(--brand-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  margin-top: 0.25rem;
+}
+
+.saveBtn:hover {
+  background-color: var(--brand-primary-hover);
+}

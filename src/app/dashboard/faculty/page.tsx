@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import styles from './faculty.module.css'
-import { assignFaculty } from './actions'
+import { assignFaculty, deleteAssignment } from './actions'
 
 export default async function FacultyPage() {
   const supabase = await createClient()
@@ -31,11 +31,22 @@ export default async function FacultyPage() {
     .from('faculty_subjects')
     .select(`
       id,
+      faculty_id,
       users (email),
       subjects (name),
       semesters (name, departments(name))
     `)
     .order('id')
+
+  // Group assignments by faculty
+  const groupedAssignments = assignments?.reduce((acc: any, curr: any) => {
+    const email = curr.users?.email || 'Unknown Faculty'
+    if (!acc[email]) {
+      acc[email] = []
+    }
+    acc[email].push(curr)
+    return acc
+  }, {})
 
   return (
     <div className={styles.container}>
@@ -74,19 +85,31 @@ export default async function FacultyPage() {
 
       <div className={styles.card}>
         <h2>Current Assignments</h2>
-        {assignments && assignments.length > 0 ? (
-          <ul className={styles.list}>
-            {assignments.map((assignment: any) => (
-              <li key={assignment.id} className={styles.listItem}>
-                <div className={styles.assignmentInfo}>
-                  <span className={styles.facultyEmail}>{assignment.users?.email}</span>
-                  <span className={styles.badge}>
-                    {assignment.semesters?.departments?.name} / {assignment.semesters?.name} / {assignment.subjects?.name}
-                  </span>
-                </div>
-              </li>
+        {groupedAssignments && Object.keys(groupedAssignments).length > 0 ? (
+          <div className={styles.groupsContainer}>
+            {Object.keys(groupedAssignments).map(facultyEmail => (
+              <div key={facultyEmail} className={styles.facultyGroup}>
+                <h3 className={styles.facultyTitle}>{facultyEmail}</h3>
+                <ul className={styles.list}>
+                  {groupedAssignments[facultyEmail].map((assignment: any) => (
+                    <li key={assignment.id} className={styles.listItem}>
+                      <div className={styles.assignmentInfo}>
+                        <span className={styles.badge}>
+                          {assignment.semesters?.departments?.name} / {assignment.semesters?.name} / {assignment.subjects?.name}
+                        </span>
+                      </div>
+                      <form action={async () => {
+                        'use server'
+                        await deleteAssignment(assignment.id)
+                      }}>
+                        <button type="submit" className={styles.deleteBtn}>Remove</button>
+                      </form>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
         ) : (
           <p className={styles.emptyState}>No faculty assigned yet.</p>
         )}

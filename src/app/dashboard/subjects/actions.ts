@@ -21,3 +21,25 @@ export async function addSubject(formData: FormData) {
   
   revalidatePath('/dashboard/subjects')
 }
+
+export async function bulkAddSubjects(data: any[], semester_id: number) {
+  const supabase = await createClient()
+  
+  if (!semester_id || !data || data.length === 0) return { error: 'Invalid data' }
+  
+  const inserts = data.map(row => ({
+    name: row['Name'] || row['name'],
+    code: row['Code'] || row['code'] || '',
+    semester_id
+  })).filter(s => s.name)
+  
+  const { error } = await supabase.from('subjects').insert(inserts)
+  
+  if (error) {
+    console.error('Error in bulkAddSubjects:', error)
+    return { error: error.message }
+  }
+  
+  revalidatePath('/dashboard/subjects')
+  return { count: inserts.length }
+}

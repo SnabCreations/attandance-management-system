@@ -167,3 +167,34 @@
   font-style: italic;
   padding: 1rem;
 }
+
+.secondaryButton {
+  background-color: transparent;
+  color: var(--brand-primary);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--brand-primary);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.secondaryButton:hover {
+  background-color: rgba(37, 99, 235, 0.05);
+}
+
+.deleteBtn {
+  background-color: transparent;
+  color: #ef4444;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #ef4444;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.deleteBtn:hover {
+  background-color: #fef2f2;
+}

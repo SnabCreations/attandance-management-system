@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import styles from './semesters.module.css'
 import { addSemester } from './actions'
 import PromoteForm from './PromoteForm'
+import BulkSemesterUpload from './BulkSemesterUpload'
 
 export default async function SemestersPage() {
   const supabase = await createClient()
@@ -73,6 +74,7 @@ export default async function SemestersPage() {
             Create Semester
           </button>
         </form>
+        <BulkSemesterUpload departments={departments || []} />
       </div>
 
       <div className={styles.card}>

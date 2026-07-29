@@ -140,3 +140,77 @@ export async function updateUserRoles(formData: FormData) {
   revalidatePath('/dashboard/users')
   return { success: true }
 }
+
+export async function toggleBlockUser(formData: FormData) {
+  const supabase = await createClient()
+  
+  // 1. Verify caller is an Admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  
+  const { data: callerProfile } = await supabase
+    .from('users')
+    .select('roles')
+    .eq('id', user.id)
+    .single()
+    
+  if (!callerProfile?.roles?.includes('Admin')) return
+  
+  const target_user_id = formData.get('user_id') as string
+  const current_status = formData.get('current_status') as string // 'blocked' or 'active'
+  
+  if (!target_user_id || target_user_id === user.id) return // prevent self block
+  
+  const adminClient = createAdminClient()
+  
+  // To block, ban for 10 years (87600h). To unblock, set ban_duration to "none"
+  const ban_duration = current_status === 'blocked' ? "none" : "87600h"
+  
+  await adminClient.auth.admin.updateUserById(target_user_id, { ban_duration })
+  
+  revalidatePath('/dashboard/users')
+}
+
+export async function bulkAddUsers(data: any[]) {
+  const supabase = await createClient()
+  
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+  
+  const { data: callerProfile } = await supabase.from('users').select('roles').eq('id', user.id).single()
+  if (!callerProfile?.roles?.includes('Admin')) return { error: 'Unauthorized' }
+  
+  if (!data || data.length === 0) return { error: 'Empty file' }
+  
+  const adminClient = createAdminClient()
+  let successCount = 0
+  
+  for (const row of data) {
+    const email = row['Email'] || row['email']
+    const roleString = row['Role'] || row['role'] || 'Faculty'
+    
+    if (!email) continue
+    
+    const roles = roleString.split(',').map((r: string) => r.trim()).filter(Boolean)
+    const password = generateRandomPassword()
+    
+    const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true
+    })
+    
+    if (!authError && authData.user) {
+      await adminClient.from('users').insert([{
+        id: authData.user.id,
+        email,
+        roles,
+        force_password_reset: true
+      }])
+      successCount++
+    }
+  }
+  
+  revalidatePath('/dashboard/users')
+  return { count: successCount }
+}

@@ -1,98 +1,131 @@
 import Link from "next/link";
+import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
+import styles from './landing.module.css'
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = await createClient()
+  
+  const adminSupabase = createAdminClient()
+  const { data: announcements } = await adminSupabase
+    .from('announcements')
+    .select('title, content, created_at')
+    .eq('target_audience', 'all')
+    .order('created_at', { ascending: false })
+    .limit(10)
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className={styles.pageContainer}>
       {/* Navigation */}
-      <nav className="w-full bg-white shadow-sm py-4 px-6 md:px-12 flex justify-between items-center">
-        <div className="flex items-center gap-3">
+      <nav className={styles.navbar}>
+        <div className={styles.navLogo}>
           <img 
             src="https://carmelpoly.in/_next/image?url=%2Fmainlogo.png&w=2048&q=75" 
             alt="Carmel Logo" 
-            className="h-8 w-auto object-contain"
+            className={styles.logoImageSmall}
           />
-          <span className="font-bold text-xl text-slate-800 hidden sm:block">Carmel AMS</span>
+          <span className={styles.logoText}>MEAMS</span>
         </div>
-        <div className="flex gap-4">
-          <Link 
-            href="/login" 
-            className="px-5 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
-          >
-            Sign In
-          </Link>
-          <Link 
-            href="/dashboard" 
-            className="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors shadow-sm"
-          >
-            Dashboard
+        <div>
+          <Link href="/login" className={styles.loginBtn}>
+            Login to Portal
           </Link>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <main className="flex-1 flex flex-col items-center justify-center text-center px-6 py-20">
-        <div className="max-w-4xl flex flex-col items-center animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <div className="inline-block p-3 bg-white rounded-full shadow-lg mb-8">
-            <img 
-              src="https://carmelpoly.in/_next/image?url=%2Fmainlogo.png&w=2048&q=75" 
-              alt="Carmel Logo" 
-              className="h-12 md:h-16 w-auto object-contain"
-            />
-          </div>
-          
-          <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight mb-6">
-            Carmel Mech <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">
-              Attendance Management
-            </span>
-          </h1>
-          
-          <p className="text-lg md:text-xl text-slate-600 max-w-2xl mb-10 leading-relaxed">
-            A secure, role-based platform designed specifically for the Mechanical Engineering department to streamline attendance tracking, assignment grading, and academic oversight.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <Link 
-              href="/login" 
-              className="w-full sm:w-auto px-8 py-3.5 text-base font-semibold text-white bg-slate-900 rounded-full hover:bg-slate-800 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-            >
-              Secure Portal Login
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      <main className={styles.mainContent}>
+        <div className={styles.heroGrid}>
+          <div className={styles.heroLeft}>
+            <div className={styles.heroLogoContainer}>
+              <img 
+                src="https://carmelpoly.in/_next/image?url=%2Fmainlogo.png&w=2048&q=75" 
+                alt="Carmel Logo" 
+                className={styles.logoImageLarge}
+              />
+            </div>
+            
+            <h1 className={styles.heroTitle}>
+              <span className={styles.highlightText}>MEAMS</span> Carmel
+            </h1>
+            
+            <p className={styles.heroSubtitle}>
+              Mechanical Engineer Attendance Management System
+            </p>
+
+            <p className={styles.heroDescription}>
+              A secure, role-based platform designed specifically for the Mechanical Engineering department to streamline attendance tracking, assignment grading, and academic oversight.
+            </p>
+            
+            <Link href="/login" className={styles.ctaBtn}>
+              Login
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </Link>
           </div>
+
+          {/* Announcements Sidebar */}
+          {announcements && announcements.length > 0 && (
+            <div className={styles.heroRight}>
+              <div className={styles.announcementPanel}>
+                <div className={styles.announcementHeader}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                  Public Announcements
+                </div>
+                <div className={styles.announcementScrollArea}>
+                  <div className={styles.announcementList}>
+                    {[...announcements, ...announcements].map((ann, idx) => {
+                      const isNew = new Date().getTime() - new Date(ann.created_at).getTime() < 7 * 24 * 60 * 60 * 1000;
+                      return (
+                        <div key={idx} className={styles.announcementCard}>
+                          <div className={styles.announcementCardHeader}>
+                            <h4 className={styles.announcementCardTitle}>{ann.title}</h4>
+                            {isNew && <span className={styles.newBadge}>New</span>}
+                          </div>
+                          <p className={styles.announcementCardBody}>{ann.content}</p>
+                          <span className={styles.announcementCardDate}>
+                            {new Date(ann.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Feature Highlights */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mt-24">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
-            <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <div className={styles.featuresGrid}>
+          <div className={styles.featureCard}>
+            <div className={`${styles.featureIcon} ${styles.iconBlue}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             </div>
-            <h3 className="font-semibold text-slate-900 mb-2">Role-Based Access</h3>
-            <p className="text-sm text-slate-500">Dedicated dashboards for Admins, Faculty, Tutors, and Parents. You only see what matters to you.</p>
+            <h3 className={styles.featureTitle}>Role-Based Access</h3>
+            <p className={styles.featureDesc}>Dedicated dashboards for Admins, Faculty, Tutors, and Parents. You only see what matters to you.</p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
-            <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <div className={styles.featureCard}>
+            <div className={`${styles.featureIcon} ${styles.iconEmerald}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             </div>
-            <h3 className="font-semibold text-slate-900 mb-2">Bulk Attendance</h3>
-            <p className="text-sm text-slate-500">Mark absentees in bulk with a highly optimized, single-screen interface. Fast and completely seamless.</p>
+            <h3 className={styles.featureTitle}>Hourly Attendance</h3>
+            <p className={styles.featureDesc}>Mark absentees on an hourly basis with a highly optimized interface connected directly to the timetable.</p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
-            <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+          <div className={styles.featureCard}>
+            <div className={`${styles.featureIcon} ${styles.iconPurple}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
             </div>
-            <h3 className="font-semibold text-slate-900 mb-2">Assignment Tracking</h3>
-            <p className="text-sm text-slate-500">Live assignment updates syncing from Faculty down to Parent dashboards, sorted by urgency.</p>
+            <h3 className={styles.featureTitle}>Timetable Integration</h3>
+            <p className={styles.featureDesc}>Live timetable and assignment updates syncing from Faculty down to Parent dashboards instantly.</p>
           </div>
         </div>
       </main>
       
       {/* Footer */}
-      <footer className="py-6 border-t border-slate-200 text-center text-slate-500 text-sm">
-        <p>&copy; {new Date().getFullYear()} Carmel Polytechnic College. All rights reserved.</p>
+      <footer className={styles.footer}>
+        <p>&copy; {new Date().getFullYear()} <a href="https://carmelpoly.in" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>Carmel Polytechnic College</a>. MEAMS. All rights reserved.</p>
       </footer>
     </div>
   );
