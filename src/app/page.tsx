@@ -143,9 +143,9 @@ export default async function LandingPage() {
       {/* Footer */}
       <footer className={styles.footer}>
         <p>
-          &copy; {new Date().getFullYear()} <a href="https://carmelpoly.in" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>Carmel Polytechnic College</a>. MEAMS. All rights reserved.<br/>
-          <span style={{ fontSize: '0.75rem', marginTop: '0.5rem', display: 'inline-block', opacity: 0.8 }}>
-            Developed & Crafted by <strong>Snab Creations</strong>
+          &copy; {new Date().getFullYear()} <a href="https://carmelpoly.in" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>Carmel Polytechnic College</a>. All rights reserved.<br/>
+          <span style={{ fontSize: '0.65rem', marginTop: '0.5rem', display: 'inline-block', opacity: 0.8 }}>
+            Crafted by <strong>Snab Creations</strong>
           </span>
         </p>
       </footer>

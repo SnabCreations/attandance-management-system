@@ -44,7 +44,13 @@ export default function DashboardShell({
           <div className={styles.topbarTitle}>Dashboard</div>
         </header>
         <div className={styles.contentArea}>
-          {children}
+          <div className={styles.pageWrapper}>
+            {children}
+          </div>
+          <footer className={styles.dashboardFooter}>
+            &copy; {new Date().getFullYear()} Carmel Polytechnic College. All rights reserved.<br/>
+            <span>Crafted by <strong>Snab Creations</strong></span>
+          </footer>
         </div>
       </main>
     </div>

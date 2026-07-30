@@ -73,9 +73,9 @@ export default async function LoginPage({
       </div>
       <div className={styles.footer}>
         <p>
-          &copy; {new Date().getFullYear()} Carmel Polytechnic College. MEAMS. All rights reserved.<br/>
+          &copy; {new Date().getFullYear()} Carmel Polytechnic College. All rights reserved.<br/>
           <span>
-            Developed & Crafted by <strong>Snab Creations</strong>
+            Crafted by <strong>Snab Creations</strong>
           </span>
         </p>
       </div>

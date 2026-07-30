@@ -154,6 +154,27 @@
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.pageWrapper {
+  flex: 1;
+}
+
+.dashboardFooter {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  color: var(--text-muted);
+}
+
+.dashboardFooter span {
+  font-size: 0.65rem;
+  opacity: 0.8;
+  display: inline-block;
+  margin-top: 0.25rem;
 }
 
 .topbar {
