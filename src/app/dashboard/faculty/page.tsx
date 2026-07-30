@@ -33,7 +33,7 @@ export default async function FacultyPage() {
     .select(`
       id,
       faculty_id,
-      users (email),
+      users (email, avatar_url),
       subjects (name),
       semesters (name, departments(name))
     `)
@@ -42,10 +42,14 @@ export default async function FacultyPage() {
   // Group assignments by faculty
   const groupedAssignments = assignments?.reduce((acc: any, curr: any) => {
     const email = curr.users?.email || 'Unknown Faculty'
+    const avatar_url = curr.users?.avatar_url || null
     if (!acc[email]) {
-      acc[email] = []
+      acc[email] = {
+        avatar: avatar_url,
+        assignments: []
+      }
     }
-    acc[email].push(curr)
+    acc[email].assignments.push(curr)
     return acc
   }, {})
 
@@ -91,9 +95,18 @@ export default async function FacultyPage() {
           <div className={styles.groupsContainer}>
             {Object.keys(groupedAssignments).map(facultyEmail => (
               <div key={facultyEmail} className={styles.facultyGroup}>
-                <h3 className={styles.facultyTitle}>{facultyEmail}</h3>
+                <h3 className={styles.facultyTitle} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  {groupedAssignments[facultyEmail].avatar ? (
+                    <img src={groupedAssignments[facultyEmail].avatar} alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
+                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                  )}
+                  {facultyEmail}
+                </h3>
                 <ul className={styles.list}>
-                  {groupedAssignments[facultyEmail].map((assignment: any) => (
+                  {groupedAssignments[facultyEmail].assignments.map((assignment: any) => (
                     <li key={assignment.id} className={styles.listItem}>
                       <div className={styles.assignmentInfo}>
                         <span className={styles.badge}>

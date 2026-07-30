@@ -29,7 +29,7 @@ export default async function UsersPage() {
   // Fetch all custom users
   const { data: dbUsers } = await adminClient
     .from('users')
-    .select('id, email, roles, created_at')
+    .select('id, email, roles, created_at, avatar_url')
     .order('created_at', { ascending: false })
 
   // Fetch all auth users to check ban status
@@ -72,7 +72,18 @@ export default async function UsersPage() {
             <tbody>
               {users?.map((user: any) => (
                 <tr key={user.id}>
-                  <td className={styles.email}>{user.email}</td>
+                  <td className={styles.email}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      {user.avatar_url ? (
+                        <img src={user.avatar_url} alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                      ) : (
+                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                      )}
+                      <span>{user.email}</span>
+                    </div>
+                  </td>
                   <td>
                     {user.roles && user.roles.map((r: string) => (
                       <span key={r} className={`${styles.roleBadge} ${styles[r.toLowerCase()]}`} style={{ marginRight: '0.5rem' }}>

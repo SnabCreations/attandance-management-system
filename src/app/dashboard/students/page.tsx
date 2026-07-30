@@ -48,7 +48,7 @@ export default async function AdminStudentRegistryPage({
       department_id,
       semesters (name, departments(name)),
       parent_id,
-      parent:users!students_parent_id_fkey (email),
+      parent:users!students_parent_id_fkey (email, avatar_url),
       updater:users!students_updated_by_fkey (email)
     `)
     .order('roll_no')
@@ -76,6 +76,7 @@ export default async function AdminStudentRegistryPage({
 
   const mappedStudents = students?.map((student: any) => {
     let parentEmail = student.parent?.email
+    let parentAvatar = student.parent?.avatar_url
     let updatedByEmail = student.updater?.email || 'N/A'
     let isBlocked = false
     
@@ -87,6 +88,7 @@ export default async function AdminStudentRegistryPage({
     return {
       ...student,
       parentEmail,
+      parentAvatar,
       updatedByEmail,
       isBlocked
     }
@@ -135,7 +137,18 @@ export default async function AdminStudentRegistryPage({
               {mappedStudents?.map((student: any) => (
                 <tr key={student.id}>
                   <td className={styles.rollNo}>{student.roll_no}</td>
-                  <td className={styles.studentName}>{student.name}</td>
+                  <td className={styles.studentName}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      {student.parentAvatar ? (
+                        <img src={student.parentAvatar} alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                      ) : (
+                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                      )}
+                      <span>{student.name}</span>
+                    </div>
+                  </td>
                   <td>
                     <span className={styles.badge}>
                       {student.semesters?.departments?.name} / {student.semesters?.name}
