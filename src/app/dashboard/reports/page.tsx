@@ -16,6 +16,18 @@ export default async function AdminReportsPage() {
     .from('attendance')
     .select('status')
   
+  const { data: recentStudents } = await supabase
+    .from('students')
+    .select('id, name, created_at, semesters(name, departments(name))')
+    .order('created_at', { ascending: false })
+    .limit(5)
+    
+  const { data: recentTests } = await supabase
+    .from('tests')
+    .select('id, title, test_date, max_marks, subjects(name)')
+    .order('created_at', { ascending: false })
+    .limit(5)
+  
   const totalLogs = allAttendance?.length || 0
   const presentLogs = allAttendance?.filter(a => a.status === 'Present').length || 0
   const globalAttendance = totalLogs > 0 ? Math.round((presentLogs / totalLogs) * 100) : 0
@@ -48,11 +60,51 @@ export default async function AdminReportsPage() {
         </div>
       </div>
 
-      <div className={styles.card}>
-        <h2>Recent System Activity</h2>
-        <p className={styles.subtitle}>More detailed system-wide analytics will be rendered here.</p>
-        <div className={styles.placeholderBox}>
-          Analytics Dashboard Visualization Space
+      <div className={styles.statsGrid}>
+        <div className={styles.card}>
+          <h2>Recent Enrollments</h2>
+          {recentStudents && recentStudents.length > 0 ? (
+            <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {recentStudents.map((s: any) => (
+                <li key={s.id} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
+                  <div>
+                    <strong>{s.name}</strong>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                      {s.semesters?.departments?.name} - {s.semesters?.name}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    {new Date(s.created_at).toLocaleDateString()}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className={styles.subtitle}>No recent enrollments.</p>
+          )}
+        </div>
+
+        <div className={styles.card}>
+          <h2>Recent Tests Scheduled</h2>
+          {recentTests && recentTests.length > 0 ? (
+            <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {recentTests.map((t: any) => (
+                <li key={t.id} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
+                  <div>
+                    <strong>{t.title}</strong>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                      {t.subjects?.name} ({t.max_marks} marks)
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    {new Date(t.test_date).toLocaleDateString()}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className={styles.subtitle}>No tests scheduled yet.</p>
+          )}
         </div>
       </div>
     </div>

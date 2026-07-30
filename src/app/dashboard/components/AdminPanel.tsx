@@ -11,12 +11,12 @@ export default async function AdminPanel() {
   
   // For the chart, let's fetch students per department
   const { data: depts } = await adminClient.from('departments').select('id, name')
-  const { data: students } = await adminClient.from('students').select('department_id')
+  const { data: students } = await adminClient.from('students').select('semester_id, semesters(department_id)')
   
-  const chartData = (depts || []).map((d: any) => ({
-    name: d.name,
-    students: (students || []).filter((s: any) => s.department_id === d.id).length
-  }))
+  const chartData = (depts || []).map((d: any) => {
+    const studentCount = (students || []).filter((s: any) => s.semesters?.department_id === d.id).length
+    return { name: d.name, students: studentCount }
+  })
 
   return (
     <div className={styles.dashboardSection}>

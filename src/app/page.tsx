@@ -24,7 +24,11 @@ export default async function LandingPage() {
             alt="Carmel Logo" 
             className={styles.logoImageSmall}
           />
-          <span className={styles.logoText}>MEAMS</span>
+          <img 
+            src="/meams-logo.webp"
+            alt="MEAMS Logo"
+            className={styles.platformLogoSmall}
+          />
         </div>
         <div>
           <Link href="/login" className={styles.loginBtn}>
@@ -42,6 +46,11 @@ export default async function LandingPage() {
                 src="https://carmelpoly.in/_next/image?url=%2Fmainlogo.png&w=2048&q=75" 
                 alt="Carmel Logo" 
                 className={styles.logoImageLarge}
+              />
+              <img 
+                src="/meams-logo.webp"
+                alt="MEAMS Logo"
+                className={styles.platformLogoLarge}
               />
             </div>
             

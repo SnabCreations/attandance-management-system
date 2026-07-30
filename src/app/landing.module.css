@@ -5,6 +5,21 @@
   font-family: 'Inter', system-ui, sans-serif;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   color: var(--text-primary);
+  position: relative;
+}
+
+.pageContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('/meams-logo.webp') center center no-repeat;
+  background-size: 60%;
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .navbar {
@@ -35,6 +50,12 @@
 
 .logoImageSmall {
   height: 2rem;
+  width: auto;
+  object-fit: contain;
+}
+
+.platformLogoSmall {
+  height: 2.5rem;
   width: auto;
   object-fit: contain;
 }
@@ -76,6 +97,8 @@
   align-items: center;
   text-align: center;
   padding: 8rem 1.5rem 5rem 1.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .heroGrid {
@@ -111,13 +134,16 @@
 }
 
 .heroLogoContainer {
-  display: inline-block;
-  padding: 1rem;
-  background: white;
-  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 2rem;
   box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
   margin-bottom: 2rem;
   transition: transform 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
 .heroLogoContainer:hover {
@@ -130,8 +156,17 @@
   object-fit: contain;
 }
 
+.platformLogoLarge {
+  height: 4rem;
+  width: auto;
+  object-fit: contain;
+}
+
 @media (min-width: 768px) {
   .logoImageLarge {
+    height: 5rem;
+  }
+  .platformLogoLarge {
     height: 5rem;
   }
 }

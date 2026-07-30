@@ -15,7 +15,7 @@ export default function Greeting({ name = '' }: { name?: string }) {
 
   return (
     <div className={styles.greetingContainer}>
-      <h1 className={styles.greetingText}>{greeting}{name ? `, ${name}` : ''}</h1>
+      <h1 className={styles.greetingText}>Hi{name ? ` ${name}` : ''}, {greeting}</h1>
     </div>
   )
 }
