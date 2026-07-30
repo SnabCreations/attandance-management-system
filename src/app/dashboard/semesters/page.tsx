@@ -24,10 +24,10 @@ export default async function SemestersPage() {
     .contains('roles', ['Tutor'])
     .order('email')
 
-  // Fetch semesters with their associated department names and tutor
+  // Fetch semesters with their associated department names and multiple tutors
   const { data: semesters } = await supabase
     .from('semesters')
-    .select('*, departments(name), users(email)')
+    .select('*, departments(name), semester_tutors(tutor_id, users(email))')
     .order('id')
 
   return (
@@ -59,9 +59,8 @@ export default async function SemestersPage() {
           </div>
           
           <div className={styles.inputGroup}>
-            <label htmlFor="tutor_id">Assign Tutor (Semester In-Charge)</label>
-            <select id="tutor_id" name="tutor_id" className={styles.select}>
-              <option value="">None</option>
+            <label htmlFor="tutor_id">Assign Tutors (Hold Ctrl/Cmd to select multiple)</label>
+            <select id="tutor_id" name="tutor_id" className={styles.select} multiple style={{ height: '120px' }}>
               {tutors?.map((tutor) => (
                 <option key={tutor.id} value={tutor.id}>
                   {tutor.email}
@@ -86,9 +85,9 @@ export default async function SemestersPage() {
                 <div className={styles.semInfo}>
                   <span className={styles.semName}>{sem.name}</span>
                   <span className={styles.deptBadge}>{sem.departments?.name}</span>
-                  {sem.users?.email && (
+                  {sem.semester_tutors && sem.semester_tutors.length > 0 && (
                     <span className={styles.deptBadge} style={{ backgroundColor: 'var(--accent)', marginLeft: '0.5rem' }}>
-                      Tutor: {sem.users.email}
+                      Tutors: {sem.semester_tutors.map((st: any) => st.users?.email).filter(Boolean).join(', ')}
                     </span>
                   )}
                 </div>

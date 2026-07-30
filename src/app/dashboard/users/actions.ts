@@ -4,13 +4,10 @@ import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
-function generateRandomPassword() {
-  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*'
-  let password = ''
-  for (let i = 0; i < 12; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
-  return password
+function generatePasswordFromName(nameOrEmail: string) {
+  // Extract up to 4 letters, default to 'user' if empty
+  const base = nameOrEmail.replace(/[^a-zA-Z]/g, '').substring(0, 4) || 'user'
+  return `${base.toLowerCase()}@123ams`
 }
 
 export async function createUser(formData: FormData) {
@@ -34,7 +31,8 @@ export async function createUser(formData: FormData) {
   if (!email || roles.length === 0) return { error: 'Missing fields' }
 
   // 2. Generate Password
-  const password = generateRandomPassword()
+  const nameToUse = email.split('@')[0]
+  const password = generatePasswordFromName(nameToUse)
 
   // 3. Create user in Supabase Auth
   const adminClient = createAdminClient()
@@ -192,7 +190,8 @@ export async function bulkAddUsers(data: any[]) {
     if (!email) continue
     
     const roles = roleString.split(',').map((r: string) => r.trim()).filter(Boolean)
-    const password = generateRandomPassword()
+    const nameToUse = row['Name'] || row['name'] || email.split('@')[0]
+    const password = generatePasswordFromName(nameToUse)
     
     const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
       email,
@@ -213,4 +212,51 @@ export async function bulkAddUsers(data: any[]) {
   
   revalidatePath('/dashboard/users')
   return { count: successCount }
+}
+
+export async function resetUserPassword(formData: FormData) {
+  const supabase = await createClient()
+  
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  
+  const { data: callerProfile } = await supabase
+    .from('users')
+    .select('roles')
+    .eq('id', user.id)
+    .single()
+    
+  if (!callerProfile?.roles?.includes('Admin')) return
+  
+  const target_user_id = formData.get('user_id') as string
+  const target_email = formData.get('email') as string
+  
+  if (!target_user_id || !target_email) return
+  
+  // We need to fetch the target user's roles to know which password to generate
+  const { data: targetProfile } = await supabase
+    .from('users')
+    .select('roles')
+    .eq('id', target_user_id)
+    .single()
+    
+  const target_roles = targetProfile?.roles || []
+  
+  const adminClient = createAdminClient()
+  
+  let defaultPassword = ''
+  if (target_roles.includes('Parent') || target_roles.includes('Student')) {
+    defaultPassword = 'ams@carmel123'
+  } else {
+    // Generate faculty/tutor password
+    defaultPassword = generatePasswordFromName(target_email.split('@')[0])
+  }
+  
+  await adminClient.auth.admin.updateUserById(target_user_id, {
+    password: defaultPassword
+  })
+  
+  await adminClient.from('users').update({ force_password_reset: true }).eq('id', target_user_id)
+  
+  revalidatePath('/dashboard/users')
 }

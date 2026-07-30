@@ -48,6 +48,7 @@ export default async function DashboardLayout({
             <>
               <div className={styles.navSection}>System Administration</div>
               <Link href="/dashboard/users" className={styles.navLink}>User Accounts</Link>
+              <Link href="/dashboard/students" className={styles.navLink}>Student & Parent Registry</Link>
               <Link href="/dashboard/announcements" className={styles.navLink}>Announcements</Link>
               <Link href="/dashboard/faculty/attendance" className={styles.navLink}>Fallback Attendance</Link>
               
@@ -56,6 +57,7 @@ export default async function DashboardLayout({
               <Link href="/dashboard/semesters" className={styles.navLink}>Semesters</Link>
               <Link href="/dashboard/subjects" className={styles.navLink}>Subjects</Link>
               <Link href="/dashboard/timetables" className={styles.navLink}>Timetables</Link>
+              <Link href="/dashboard/timetables/hours" className={styles.navLink}>Hours Setup</Link>
               <Link href="/dashboard/faculty" className={styles.navLink}>Faculty Management</Link>
               
               <div className={styles.navSection}>System Overview</div>
@@ -69,7 +71,7 @@ export default async function DashboardLayout({
               <Link href="/dashboard/tutor/students" className={styles.navLink}>Student Registry</Link>
               <Link href="/dashboard/timetables" className={styles.navLink}>Timetables</Link>
               <Link href="/dashboard/announcements" className={styles.navLink}>Announcements</Link>
-              <Link href="/dashboard/faculty/attendance" className={styles.navLink}>Log Attendance</Link>
+              <Link href="/dashboard/faculty/attendance" className={styles.navLink}>Course Log</Link>
               <Link href="/dashboard/tutor/oversight" className={styles.navLink}>Class Oversight</Link>
               
               <div className={styles.navSection}>Analytics</div>
@@ -79,10 +81,12 @@ export default async function DashboardLayout({
 
           {roles.includes('Faculty') && (
             <>
-              <div className={styles.navSection}>Teaching</div>
-              <Link href="/dashboard/announcements" className={styles.navLink}>Announcements</Link>
+              <div className={styles.navSection}>Faculty Portal</div>
               <Link href="/dashboard/faculty/attendance" className={styles.navLink}>Log Attendance</Link>
               <Link href="/dashboard/faculty/assignments" className={styles.navLink}>Assignments</Link>
+              <Link href="/dashboard/faculty/tests" className={styles.navLink}>Tests & Exams</Link>
+              <Link href="/dashboard/faculty/materials" className={styles.navLink}>Study Materials</Link>
+              <Link href="/dashboard/faculty/reports" className={styles.navLink}>My Reports</Link>
             </>
           )}
 
@@ -90,9 +94,15 @@ export default async function DashboardLayout({
             <>
               <div className={styles.navSection}>My Child</div>
               <Link href="/dashboard/parent" className={styles.navLink}>Performance</Link>
+              <Link href="/dashboard/student/assignments" className={styles.navLink}>Assignments</Link>
+              <Link href="/dashboard/student/tests" className={styles.navLink}>Tests & Exams</Link>
+              <Link href="/dashboard/student/materials" className={styles.navLink}>Study Materials</Link>
               <Link href="/dashboard/announcements" className={styles.navLink}>Announcements</Link>
             </>
           )}
+
+          <div className={styles.navSection}>Personal Space</div>
+          <Link href="/dashboard/notes" className={styles.navLink}>My Notes</Link>
         </nav>
 
         <div className={styles.sidebarFooter}>

@@ -57,7 +57,7 @@ export default function OversightView({ semesters }: { semesters: any[] }) {
                     <th>Student Name</th>
                     <th>Subject</th>
                     <th>Status</th>
-                    <th>Hours</th>
+                    <th>Timeline (Slots)</th>
                     <th>Extra?</th>
                   </tr>
                 </thead>
@@ -72,7 +72,26 @@ export default function OversightView({ semesters }: { semesters: any[] }) {
                           {log.status}
                         </span>
                       </td>
-                      <td>{log.hours}</td>
+                      <td>
+                        {log.attendance_hours && log.attendance_hours.length > 0 ? (
+                          <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
+                            {log.attendance_hours.map((ah: any, idx: number) => (
+                              <span key={idx} style={{ 
+                                backgroundColor: 'var(--bg-canvas)', 
+                                border: '1px solid var(--border-color)', 
+                                padding: '0.125rem 0.375rem', 
+                                borderRadius: '4px', 
+                                fontSize: '0.75rem',
+                                color: 'var(--text-secondary)'
+                              }}>
+                                {ah.time_slots?.name}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span style={{ color: 'var(--muted)', fontSize: '0.875rem' }}>{log.hours} Hrs (Legacy)</span>
+                        )}
+                      </td>
                       <td>{log.is_extra_hours ? 'Yes' : 'No'}</td>
                     </tr>
                   ))}

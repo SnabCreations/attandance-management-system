@@ -4,7 +4,7 @@ import DeleteButton from './DeleteButton'
 import EditUserModal from './EditUserModal'
 import BulkUserUpload from './BulkUserUpload'
 import styles from './users.module.css'
-import { deleteUser, toggleBlockUser } from './actions'
+import { deleteUser, toggleBlockUser, resetUserPassword } from './actions'
 
 export default async function UsersPage() {
   const supabase = await createClient()
@@ -98,6 +98,13 @@ export default async function UsersPage() {
                         <input type="hidden" name="current_status" value={user.isBlocked ? 'blocked' : 'active'} />
                         <button type="submit" style={{ padding: '0.375rem 0.75rem', backgroundColor: user.isBlocked ? '#10b981' : '#f59e0b', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.875rem' }}>
                           {user.isBlocked ? 'Unblock' : 'Block'}
+                        </button>
+                      </form>
+                      <form action={resetUserPassword}>
+                        <input type="hidden" name="user_id" value={user.id} />
+                        <input type="hidden" name="email" value={user.email} />
+                        <button type="submit" style={{ padding: '0.375rem 0.75rem', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.875rem' }} title="Reset to default password">
+                          Reset Password
                         </button>
                       </form>
                       <form action={deleteUser}>

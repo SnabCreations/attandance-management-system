@@ -41,7 +41,7 @@ export async function addStudentAndParent(formData: FormData) {
       // Create new user
       const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
         email: parent_email,
-        password: 'Meams@123',
+        password: 'ams@carmel123',
         email_confirm: true
       })
 
@@ -131,7 +131,7 @@ export async function bulkUploadStudents(data: any[], semester_id: number, depar
       } else {
         const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
           email: parent_email,
-          password: 'Meams@123',
+          password: 'ams@carmel123',
           email_confirm: true
         })
 

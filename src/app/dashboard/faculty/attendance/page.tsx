@@ -41,14 +41,20 @@ export default async function AttendancePage() {
       semesterIds = allSubjects.map((s: any) => s.semester_id)
     }
   } else if (isTutor) {
-    // Fetch all subjects for the semesters assigned to this tutor
-    const { data: assignedSemesters } = await adminClient
-      .from('semesters')
-      .select('id, name, departments(name)')
+    const { data: tutorSemesters } = await adminClient
+      .from('semester_tutors')
+      .select('semester_id')
       .eq('tutor_id', user.id)
       
-    if (assignedSemesters && assignedSemesters.length > 0) {
-      const semIds = assignedSemesters.map((s: any) => s.id)
+    if (tutorSemesters && tutorSemesters.length > 0) {
+      const semIds = tutorSemesters.map((s: any) => s.semester_id)
+      
+      const { data: assignedSemesters } = await adminClient
+        .from('semesters')
+        .select('id, name, departments(name)')
+        .in('id', semIds)
+
+      if (assignedSemesters && assignedSemesters.length > 0) {
       const { data: semSubjects } = await adminClient
         .from('subjects')
         .select('id, name, semester_id')
@@ -64,6 +70,7 @@ export default async function AttendancePage() {
           }
         })
         semesterIds = semIds
+        }
       }
     }
     
@@ -118,6 +125,11 @@ export default async function AttendancePage() {
     .in('semester_id', semesterIds)
     .order('roll_no')
 
+  const { data: timeSlots } = await adminClient
+    .from('time_slots')
+    .select('*')
+    .order('order_index')
+
   return (
     <div className={styles.container}>
       <div className={styles.card}>
@@ -127,6 +139,7 @@ export default async function AttendancePage() {
         <AttendanceForm 
           assignments={assignments} 
           allStudents={students || []} 
+          timeSlots={timeSlots || []}
         />
       </div>
     </div>

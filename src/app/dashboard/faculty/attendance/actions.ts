@@ -11,12 +11,14 @@ export async function submitAttendance(formData: FormData, students: any[]) {
 
   const subject_id = parseInt(formData.get('subject_id') as string)
   const date = formData.get('date') as string
-  const hours = parseInt(formData.get('hours') as string)
+  const time_slots = formData.getAll('time_slots') as string[]
   const is_extra = formData.get('is_extra') === 'on'
+  
+  const hours = time_slots.length
+  if (hours === 0) return // Ensure at least one time slot is selected
   
   // Build batch insert array
   const attendanceRecords = students.map((student) => {
-    // If the checkbox is checked, the student is Absent
     const isAbsent = formData.get(`absent_${student.id}`) === 'on'
     
     return {
@@ -30,12 +32,36 @@ export async function submitAttendance(formData: FormData, students: any[]) {
     }
   })
   
-  const { error } = await supabase
+  const { data: insertedRecords, error } = await supabase
     .from('attendance')
     .insert(attendanceRecords)
+    .select('id')
     
   if (error) {
     console.error('Error logging attendance:', error)
+    return
+  }
+  
+  // Insert into attendance_hours mapping table
+  if (insertedRecords && insertedRecords.length > 0) {
+    const hoursData: any[] = []
+    
+    insertedRecords.forEach((record) => {
+      time_slots.forEach((slotId) => {
+        hoursData.push({
+          attendance_id: record.id,
+          time_slot_id: parseInt(slotId)
+        })
+      })
+    })
+    
+    const { error: hoursError } = await supabase
+      .from('attendance_hours')
+      .insert(hoursData)
+      
+    if (hoursError) {
+      console.error('Error logging attendance hours:', hoursError)
+    }
   }
   
   revalidatePath('/dashboard/faculty/attendance')

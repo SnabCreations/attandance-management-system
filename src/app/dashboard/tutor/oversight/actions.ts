@@ -25,7 +25,10 @@ export async function fetchRecentLogs(semesterId: number) {
       hours,
       is_extra_hours,
       students(name),
-      subjects(name)
+      subjects(name),
+      attendance_hours(
+        time_slots(name, start_time, end_time)
+      )
     `)
     .in('student_id', studentIds)
     .order('date', { ascending: false })

@@ -8,19 +8,26 @@ export async function addSemester(formData: FormData) {
   
   const name = formData.get('name') as string
   const department_id = formData.get('department_id') as string
-  const tutor_id = formData.get('tutor_id') as string
+  const tutor_ids = formData.getAll('tutor_id') as string[]
   
   if (!name || !department_id) return
   
   const payload: any = { name, department_id: parseInt(department_id) }
-  if (tutor_id) payload.tutor_id = tutor_id
 
-  const { error } = await supabase
+  const { data: semesterData, error } = await supabase
     .from('semesters')
     .insert([payload])
+    .select()
+    .single()
     
   if (error) {
     console.error('Error inserting semester:', error)
+  } else if (semesterData && tutor_ids.length > 0) {
+    const tutorInserts = tutor_ids.map(id => ({
+      semester_id: semesterData.id,
+      tutor_id: id
+    }))
+    await supabase.from('semester_tutors').insert(tutorInserts)
   }
   
   revalidatePath('/dashboard/semesters')

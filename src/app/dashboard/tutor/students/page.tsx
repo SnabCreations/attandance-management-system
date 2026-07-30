@@ -12,13 +12,29 @@ export default async function StudentRegistryPage() {
   const { data: userProfile } = await supabase.from('users').select('roles').eq('id', user.id).single()
   const isAdmin = userProfile?.roles?.includes('Admin')
 
+  let semesterIds: number[] = []
+
+  if (!isAdmin) {
+    const { data: assignedSemesters } = await supabase
+      .from('semester_tutors')
+      .select('semester_id')
+      .eq('tutor_id', user.id)
+      
+    semesterIds = assignedSemesters?.map(s => s.semester_id) || []
+  }
+
   let semesterQuery = supabase
     .from('semesters')
     .select('id, name, department_id, departments(name)')
     .order('department_id')
 
   if (!isAdmin) {
-    semesterQuery = semesterQuery.eq('tutor_id', user.id)
+    if (semesterIds.length === 0) {
+      // Return empty if not assigned
+      semesterQuery = semesterQuery.in('id', [0])
+    } else {
+      semesterQuery = semesterQuery.in('id', semesterIds)
+    }
   }
 
   const { data: semesters } = await semesterQuery

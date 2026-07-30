@@ -4,10 +4,9 @@ import { useState } from 'react'
 import { submitAttendance } from './actions'
 import styles from './attendance.module.css'
 
-export default function AttendanceForm({ assignments, allStudents }: { assignments: any[], allStudents: any[] }) {
+export default function AttendanceForm({ assignments, allStudents, timeSlots }: { assignments: any[], allStudents: any[], timeSlots: any[] }) {
   const [selectedSubject, setSelectedSubject] = useState('')
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
-  const [hours, setHours] = useState('1')
   const [isExtra, setIsExtra] = useState(false)
   const [isPending, setIsPending] = useState(false)
 
@@ -25,6 +24,9 @@ export default function AttendanceForm({ assignments, allStudents }: { assignmen
     setIsPending(false)
     alert('Attendance logged successfully!')
   }
+
+  // Filter out breaks for selection
+  const classHours = timeSlots.filter(t => !t.is_break)
 
   return (
     <form action={handleSubmit} className={styles.form}>
@@ -61,22 +63,23 @@ export default function AttendanceForm({ assignments, allStudents }: { assignmen
           />
         </div>
 
-        <div className={styles.inputGroup}>
-          <label htmlFor="hours">Hours Taught</label>
-          <input 
-            type="number" 
-            id="hours" 
-            name="hours" 
-            min="1" 
-            max="6" 
-            value={hours}
-            onChange={(e) => setHours(e.target.value)}
-            required 
-            className={styles.input}
-          />
+        <div className={styles.inputGroup} style={{ gridColumn: '1 / -1' }}>
+          <label>Select Time Slots (Hours Taught)</label>
+          <div className={styles.timeSlotGrid}>
+            {classHours.map(slot => (
+              <label key={slot.id} className={styles.timeSlotCard}>
+                <input type="checkbox" name="time_slots" value={slot.id} />
+                <div className={styles.timeSlotContent}>
+                  <span className={styles.timeSlotName}>{slot.name}</span>
+                  <span className={styles.timeSlotTime}>{slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)}</span>
+                </div>
+              </label>
+            ))}
+            {classHours.length === 0 && <span style={{ color: 'var(--muted)' }}>No time slots configured. Contact Admin.</span>}
+          </div>
         </div>
 
-        <div className={styles.checkboxGroup}>
+        <div className={styles.checkboxGroup} style={{ gridColumn: '1 / -1' }}>
           <input 
             type="checkbox" 
             id="is_extra" 

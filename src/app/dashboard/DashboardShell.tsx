@@ -43,7 +43,7 @@ export default function DashboardShell({
           </button>
           <div className={styles.topbarTitle}>Dashboard</div>
         </header>
-        <div className={styles.pageContent}>
+        <div className={styles.contentArea}>
           {children}
         </div>
       </main>

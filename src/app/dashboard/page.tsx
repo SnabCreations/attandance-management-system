@@ -4,6 +4,7 @@ import AdminPanel from './components/AdminPanel'
 import TutorPanel from './components/TutorPanel'
 import FacultyPanel from './components/FacultyPanel'
 import ParentPanel from './components/ParentPanel'
+import Greeting from './components/Greeting'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -35,6 +36,7 @@ export default async function DashboardPage() {
 
   return (
     <div className={styles.container}>
+      <Greeting />
       {roles.includes('Admin') && <AdminPanel />}
       {roles.includes('Tutor') && <TutorPanel userId={user.id} />}
       {roles.includes('Faculty') && <FacultyPanel userId={user.id} />}
