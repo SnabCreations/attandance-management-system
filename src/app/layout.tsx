@@ -1,3 +1,11 @@
+/**
+ * Developed and Crafted by Snab Creations
+ * Author: @Abdulkhadhar (GitHub)
+ * Copyright (c) 2026 Carmel Polytechnic College. All rights reserved.
+ * 
+ * This code is proprietary and may not be copied, distributed, or modified
+ * without express written permission.
+ */
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";

@@ -1,3 +1,11 @@
+/**
+ * Developed and Crafted by Snab Creations
+ * Author: @Abdulkhadhar (GitHub)
+ * Copyright (c) 2026 Carmel Polytechnic College. All rights reserved.
+ * 
+ * This code is proprietary and may not be copied, distributed, or modified
+ * without express written permission.
+ */
 import Link from "next/link";
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
@@ -134,7 +142,12 @@ export default async function LandingPage() {
       
       {/* Footer */}
       <footer className={styles.footer}>
-        <p>&copy; {new Date().getFullYear()} <a href="https://carmelpoly.in" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>Carmel Polytechnic College</a>. MEAMS. All rights reserved.</p>
+        <p>
+          &copy; {new Date().getFullYear()} <a href="https://carmelpoly.in" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>Carmel Polytechnic College</a>. MEAMS. All rights reserved.<br/>
+          <span style={{ fontSize: '0.75rem', marginTop: '0.5rem', display: 'inline-block', opacity: 0.8 }}>
+            Developed & Crafted by <strong>Snab Creations</strong>
+          </span>
+        </p>
       </footer>
     </div>
   );
