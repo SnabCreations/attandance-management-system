@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/utils/supabase/admin'
+import Link from 'next/link'
 import AdminDashboardChart from './AdminDashboardChart'
 import styles from '../page.module.css'
 import { Users, GraduationCap, LayoutDashboard, AlertCircle } from 'lucide-react'
@@ -48,6 +49,15 @@ export default async function AdminPanel() {
             </div>
           )}
         </div>
+      </div>
+
+      <div className={styles.buttonGroup}>
+        <Link href="/dashboard/users" className={styles.actionButton}>
+          <Users size={18} /> Manage Users
+        </Link>
+        <Link href="/dashboard/reports" className={styles.actionButton}>
+          <LayoutDashboard size={18} /> System Reports
+        </Link>
       </div>
     </div>
   )

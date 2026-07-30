@@ -27,7 +27,8 @@ export default async function FacultyPage() {
     .order('id')
 
   // Fetch existing assignments
-  const { data: assignments } = await supabase
+  // Fetch existing assignments using adminClient to bypass RLS on users table
+  const { data: assignments } = await adminClient
     .from('faculty_subjects')
     .select(`
       id,
@@ -49,7 +50,8 @@ export default async function FacultyPage() {
   }, {})
 
   return (
-    <div className={styles.container}>
+    <div className={styles.pageWrapper}>
+      <div className={styles.container}>
       <div className={styles.card}>
         <h2>Assign Faculty to Subject</h2>
         <form action={assignFaculty} className={styles.form}>
@@ -114,6 +116,7 @@ export default async function FacultyPage() {
           <p className={styles.emptyState}>No faculty assigned yet.</p>
         )}
       </div>
+    </div>
     </div>
   )
 }

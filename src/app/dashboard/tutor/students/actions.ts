@@ -195,3 +195,12 @@ export async function deleteStudent(student_id: string) {
   revalidatePath('/dashboard/tutor/students')
   return { success: true }
 }
+
+export async function resetParentPassword(parent_id: string) {
+  const adminClient = createAdminClient()
+  const { error } = await adminClient.auth.admin.updateUserById(parent_id, {
+    password: 'ams@carmel123'
+  })
+  if (error) return { error: error.message }
+  return { success: true }
+}

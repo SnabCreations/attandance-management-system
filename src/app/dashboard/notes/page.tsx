@@ -12,7 +12,7 @@ export default async function PersonalNotesPage() {
     .from('user_notes')
     .select('*')
     .eq('user_id', user.id)
-    .order('updated_at', { ascending: false })
+    .order('created_at', { ascending: false })
 
   return (
     <div className={styles.container}>
@@ -39,10 +39,10 @@ export default async function PersonalNotesPage() {
         {notes && notes.length > 0 ? (
           notes.map((note: any) => (
             <div key={note.id} className={styles.noteCard}>
-              <p className={styles.noteContent}>{note.content}</p>
+              <p className={styles.noteContent}>{note.note}</p>
               <div className={styles.noteFooter}>
                 <span className={styles.noteDate}>
-                  {new Date(note.updated_at).toLocaleDateString()} {new Date(note.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {new Date(note.created_at).toLocaleDateString()} {new Date(note.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
                 <form action={deleteNote}>
                   <input type="hidden" name="id" value={note.id} />

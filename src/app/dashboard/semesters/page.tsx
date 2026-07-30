@@ -59,14 +59,15 @@ export default async function SemestersPage() {
           </div>
           
           <div className={styles.inputGroup}>
-            <label htmlFor="tutor_id">Assign Tutors (Hold Ctrl/Cmd to select multiple)</label>
-            <select id="tutor_id" name="tutor_id" className={styles.select} multiple style={{ height: '120px' }}>
+            <label>Assign Tutors</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', background: 'var(--bg-surface)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', maxHeight: '150px', overflowY: 'auto' }}>
               {tutors?.map((tutor) => (
-                <option key={tutor.id} value={tutor.id}>
+                <label key={tutor.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem' }}>
+                  <input type="checkbox" name="tutor_id" value={tutor.id} style={{ cursor: 'pointer' }} />
                   {tutor.email}
-                </option>
+                </label>
               ))}
-            </select>
+            </div>
           </div>
           
           <button type="submit" className={styles.button}>
@@ -91,7 +92,21 @@ export default async function SemestersPage() {
                     </span>
                   )}
                 </div>
-                <span className={styles.semId}>ID: {sem.id}</span>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                  <span className={styles.semId}>ID: {sem.id}</span>
+                  <form action={async () => {
+                    'use server'
+                    const { createAdminClient } = await import('@/utils/supabase/admin')
+                    const adminClient = createAdminClient()
+                    await adminClient.from('semesters').delete().eq('id', sem.id)
+                    const { revalidatePath } = await import('next/cache')
+                    revalidatePath('/dashboard/semesters')
+                  }}>
+                    <button type="submit" style={{ padding: '0.25rem 0.5rem', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}>
+                      Delete
+                    </button>
+                  </form>
+                </div>
               </li>
             ))}
           </ul>

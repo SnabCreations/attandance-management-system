@@ -7,10 +7,9 @@ export async function createMaterial(formData: FormData) {
   const supabase = await createClient()
   
   const title = formData.get('title') as string
-  const description = formData.get('description') as string
+  const content = formData.get('description') as string
   const subject_id = parseInt(formData.get('subject_id') as string)
-  const type = formData.get('type') as string
-  const url = formData.get('url') as string
+  const file_url = formData.get('url') as string
   
   if (!title || !subject_id) return
   
@@ -35,12 +34,11 @@ export async function createMaterial(formData: FormData) {
     .from('study_materials')
     .insert([{ 
       title, 
-      description, 
+      content, 
       subject_id,
       semester_id: mapping.semester_id,
-      type,
-      url,
-      uploaded_by: user.id
+      file_url,
+      created_by: user.id
     }])
     
   if (error) {

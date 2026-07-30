@@ -1,15 +1,21 @@
 import { createClient } from '@/utils/supabase/server'
 import styles from './students.module.css'
 import StudentRegistryForm from '../tutor/students/StudentRegistryForm'
-import { deleteStudent } from '../tutor/students/actions'
+import { deleteStudent, resetParentPassword } from '../tutor/students/actions'
 import { toggleBlockUser } from '../users/actions'
+import Pagination from '../components/Pagination'
 
 export default async function AdminStudentRegistryPage({
   searchParams
 }: {
-  searchParams: Promise<{ query?: string; department?: string; semester?: string }>
+  searchParams: Promise<{ query?: string; department?: string; semester?: string; page?: string }>
 }) {
-  const { query, department, semester } = await searchParams;
+  const { query, department, semester, page: pageStr } = await searchParams;
+  const page = parseInt(pageStr || '1')
+  const pageSize = 20
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -57,7 +63,12 @@ export default async function AdminStudentRegistryPage({
     studentsQuery = studentsQuery.eq('semester_id', parseInt(semester))
   }
 
-  const { data: students } = await studentsQuery
+  const { count: totalStudents } = await supabase.from('students').select('*', { count: 'exact', head: true })
+  
+  const { data: students } = await studentsQuery.range(from, to)
+  const totalPages = Math.ceil((totalStudents || 0) / pageSize)
+
+  const basePath = `?query=${query || ''}&department=${department || ''}&semester=${semester || ''}`
 
   const { createAdminClient } = await import('@/utils/supabase/admin')
   const adminClient = createAdminClient()
@@ -155,6 +166,18 @@ export default async function AdminStudentRegistryPage({
                         </form>
                       )}
                       
+                      
+                      {student.parent_id && (
+                        <form action={async () => {
+                          'use server'
+                          await resetParentPassword(student.parent_id)
+                        }}>
+                          <button type="submit" style={{ padding: '0.375rem 0.75rem', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.875rem' }}>
+                            Reset Password
+                          </button>
+                        </form>
+                      )}
+                      
                       <form action={async () => {
                         'use server'
                         await deleteStudent(student.id)
@@ -173,6 +196,7 @@ export default async function AdminStudentRegistryPage({
             <p className={styles.emptyState}>No students match the criteria.</p>
           )}
         </div>
+        <Pagination totalPages={totalPages} currentPage={page} basePath={basePath} />
       </div>
     </div>
   )

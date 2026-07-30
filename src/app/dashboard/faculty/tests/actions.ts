@@ -6,13 +6,11 @@ import { revalidatePath } from 'next/cache'
 export async function createTest(formData: FormData) {
   const supabase = await createClient()
   
-  const title = formData.get('title') as string
-  const description = formData.get('description') as string
+  const name = formData.get('title') as string
   const subject_id = parseInt(formData.get('subject_id') as string)
   const test_date = formData.get('test_date') as string
-  const max_marks = parseInt(formData.get('max_marks') as string)
   
-  if (!title || !subject_id || !test_date || !max_marks) return
+  if (!name || !subject_id || !test_date) return
   
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
@@ -44,12 +42,10 @@ export async function createTest(formData: FormData) {
   const { data: test, error: testError } = await adminClient
     .from('tests')
     .insert([{ 
-      title, 
-      description, 
+      name,
       subject_id,
       semester_id: mapping.semester_id,
       test_date,
-      max_marks,
       created_by: user.id
     }])
     .select()
@@ -72,7 +68,7 @@ export async function createTest(formData: FormData) {
       test_id: test.id,
       student_id: student.id,
       status: 'Pending',
-      marks_obtained: null
+      marks: null
     }))
     
     await adminClient.from('student_tests').insert(studentTests)

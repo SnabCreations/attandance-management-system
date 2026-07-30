@@ -57,10 +57,10 @@ export async function bulkAddSemesters(data: any[], department_id: number) {
 export async function promoteSemester(formData: FormData) {
   const supabase = await createClient()
   
-  const from_semester_id = formData.get('from_semester_id') as string
-  const to_semester_id = formData.get('to_semester_id') as string
+  const from_semester_id = parseInt(formData.get('from_semester_id') as string)
+  const new_semester_name = formData.get('new_semester_name') as string
   
-  if (!from_semester_id || !to_semester_id) return
+  if (!from_semester_id || !new_semester_name) return
   
   // Verify Admin
   const { data: { user } } = await supabase.auth.getUser()
@@ -68,12 +68,34 @@ export async function promoteSemester(formData: FormData) {
   const { data: userProfile } = await supabase.from('users').select('roles').eq('id', user.id).single()
   if (!userProfile?.roles?.includes('Admin')) return
   
-  const targetId = to_semester_id === 'alumni' ? null : parseInt(to_semester_id)
+  // 1. Fetch original semester
+  const { data: oldSem } = await supabase.from('semesters').select('*').eq('id', from_semester_id).single()
+  if (!oldSem) return
+
+  // 2. Create new semester
+  const { data: newSem, error: createError } = await supabase
+    .from('semesters')
+    .insert([{ name: new_semester_name, department_id: oldSem.department_id }])
+    .select()
+    .single()
+    
+  if (createError || !newSem) {
+    console.error('Error creating new semester:', createError)
+    return
+  }
+
+  // 3. Copy tutors
+  const { data: oldTutors } = await supabase.from('semester_tutors').select('tutor_id').eq('semester_id', from_semester_id)
+  if (oldTutors && oldTutors.length > 0) {
+    const newTutors = oldTutors.map(t => ({ semester_id: newSem.id, tutor_id: t.tutor_id }))
+    await supabase.from('semester_tutors').insert(newTutors)
+  }
   
+  // 4. Move students
   const { error } = await supabase
     .from('students')
-    .update({ semester_id: targetId })
-    .eq('semester_id', parseInt(from_semester_id))
+    .update({ semester_id: newSem.id })
+    .eq('semester_id', from_semester_id)
     
   if (error) {
     console.error('Error promoting batch:', error)

@@ -53,6 +53,12 @@ export default async function TimetablesPage({ searchParams }: { searchParams: P
     .from('timetables')
     .select('*')
     .in('semester_id', semesters?.map(s => s.id) || [])
+    
+  // Fetch time slots
+  const { data: timeSlots } = await adminClient
+    .from('time_slots')
+    .select('*')
+    .order('order_index')
 
   return (
     <div className={styles.container}>
@@ -91,6 +97,7 @@ export default async function TimetablesPage({ searchParams }: { searchParams: P
             slots={semesterSlots} 
             faculties={faculties || []}
             subjects={semesterSubjects}
+            timeSlots={timeSlots || []}
           />
         )
       })}

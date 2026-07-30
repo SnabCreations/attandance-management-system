@@ -33,16 +33,15 @@ export default function PromoteForm({ semesters }: { semesters: any[] }) {
       </div>
       
       <div className={styles.inputGroup}>
-        <label>To Semester (Destination)</label>
-        <select name="to_semester_id" required className={styles.select}>
-          <option value="">Select destination batch...</option>
-          {semesters?.map((sem) => (
-            <option key={sem.id} value={sem.id}>
-              {sem.departments?.name} - {sem.name}
-            </option>
-          ))}
-          <option value="alumni">Mark as Alumni / Graduate</option>
-        </select>
+        <label>New Semester Name</label>
+        <input 
+          type="text" 
+          name="new_semester_name" 
+          placeholder="e.g. Semester 2" 
+          required 
+          className={styles.input} 
+          style={{ padding: '0.75rem', border: '1px solid var(--border-color)', borderRadius: '8px' }}
+        />
       </div>
       
       <button type="submit" disabled={isPending} className={styles.button} style={{ backgroundColor: 'var(--accent)' }}>

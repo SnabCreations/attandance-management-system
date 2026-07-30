@@ -2,8 +2,15 @@ import { createClient } from '@/utils/supabase/server'
 import styles from './students.module.css'
 import StudentRegistryForm from './StudentRegistryForm'
 import { deleteStudent } from './actions'
+import Pagination from '../../components/Pagination'
 
-export default async function StudentRegistryPage() {
+export default async function StudentRegistryPage(props: { searchParams: Promise<{ page?: string }> }) {
+  const searchParams = await props.searchParams;
+  const page = parseInt(searchParams.page || '1')
+  const pageSize = 20
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -54,7 +61,14 @@ export default async function StudentRegistryPage() {
     studentsQuery = studentsQuery.in('semester_id', semesters.map((s: any) => s.id))
   }
 
-  const { data: students } = await studentsQuery
+  const countQuery = supabase.from('students').select('*', { count: 'exact', head: true })
+  if (!isAdmin && semesters && semesters.length > 0) {
+    countQuery.in('semester_id', semesters.map((s: any) => s.id))
+  }
+  const { count: totalStudents } = await countQuery
+  const totalPages = Math.ceil((totalStudents || 0) / pageSize)
+
+  const { data: students } = await studentsQuery.range(from, to)
 
   if (!isAdmin && (!semesters || semesters.length === 0)) {
     return (
@@ -121,6 +135,7 @@ export default async function StudentRegistryPage() {
             <p className={styles.emptyState}>No students registered yet.</p>
           )}
         </div>
+        <Pagination totalPages={totalPages} currentPage={page} />
       </div>
     </div>
   )

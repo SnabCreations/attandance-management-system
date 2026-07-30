@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
 import DashboardShell from './DashboardShell'
+import AvatarUpload from './components/AvatarUpload'
 
 export default async function DashboardLayout({
   children,
@@ -22,7 +23,7 @@ export default async function DashboardLayout({
 
   const { data: userProfile } = await supabase
     .from('users')
-    .select('roles, force_password_reset')
+    .select('roles, force_password_reset, avatar_url')
     .eq('id', user.id)
     .single()
 
@@ -106,12 +107,15 @@ export default async function DashboardLayout({
         </nav>
 
         <div className={styles.sidebarFooter}>
-          <div className={styles.userEmail}>{user.email}</div>
-          <form action="/auth/signout" method="post">
-            <button type="submit" className={styles.signOutButton}>
-              Sign Out
-            </button>
-          </form>
+          <AvatarUpload userId={user.id} initialAvatarUrl={userProfile?.avatar_url || null} />
+          <div style={{ flex: 1, overflow: 'hidden' }}>
+            <div className={styles.userEmail} style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{user.email}</div>
+            <form action="/auth/signout" method="post" style={{ marginTop: '0.25rem' }}>
+              <button type="submit" className={styles.signOutButton}>
+                Sign Out
+              </button>
+            </form>
+          </div>
         </div>
     </>
   )

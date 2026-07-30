@@ -23,7 +23,7 @@ export default function StudentRegistryForm({ semesters }: { semesters: any[] })
       const wb = XLSX.read(bstr, { type: 'binary' })
       const wsname = wb.SheetNames[0]
       const ws = wb.Sheets[wsname]
-      const data = XLSX.utils.sheet_to_json(ws)
+      const data = JSON.parse(JSON.stringify(XLSX.utils.sheet_to_json(ws)))
       setUploadData(data)
     }
     reader.readAsBinaryString(file)

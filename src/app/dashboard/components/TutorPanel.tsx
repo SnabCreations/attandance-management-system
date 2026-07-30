@@ -58,7 +58,7 @@ export default async function TutorPanel({ userId }: { userId: string }) {
           <Users size={18} /> Student Registry
         </Link>
         <Link href="/dashboard/faculty/attendance" className={styles.actionButton}>
-          <ClipboardCheck size={18} /> Fallback Attendance
+          <ClipboardCheck size={18} /> Mark Attendance
         </Link>
       </div>
     </div>

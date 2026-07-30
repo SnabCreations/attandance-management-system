@@ -6,8 +6,11 @@ import GradeForm from './GradeForm'
 export default async function AssignmentDetailsPage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
 
+  const { createAdminClient } = await import('@/utils/supabase/admin')
+  const adminClient = createAdminClient()
+
   // 1. Fetch the Assignment details
-  const { data: assignment } = await supabase
+  const { data: assignment } = await adminClient
     .from('assignments')
     .select('*, subjects(name)')
     .eq('id', params.id)
@@ -18,7 +21,7 @@ export default async function AssignmentDetailsPage({ params }: { params: { id: 
   }
 
   // 2. Fetch all student submissions for this assignment
-  const { data: submissions } = await supabase
+  const { data: submissions } = await adminClient
     .from('student_assignments')
     .select(`
       id,

@@ -104,7 +104,8 @@
   font-size: 0.875rem;
   color: var(--text-muted);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   gap: 1rem;
 }
 
@@ -204,15 +205,17 @@
   .topbar {
     display: flex;
     align-items: center;
-    background-color: #ffffff;
+    background-color: #0f172a;
+    color: #f8fafc;
     padding: 1rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid #1e293b;
   }
   
   .mobileMenuBtn {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #f8fafc;
   }
 
   .mobileOverlay {

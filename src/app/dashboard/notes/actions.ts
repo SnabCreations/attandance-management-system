@@ -18,7 +18,7 @@ export async function saveNote(formData: FormData) {
     // Update existing note
     const { error } = await supabase
       .from('user_notes')
-      .update({ content, updated_at: new Date().toISOString() })
+      .update({ note: content })
       .eq('id', noteId)
       .eq('user_id', user.id)
       
@@ -28,7 +28,7 @@ export async function saveNote(formData: FormData) {
     const { error } = await supabase
       .from('user_notes')
       .insert([{ 
-        content,
+        note: content,
         user_id: user.id
       }])
       

@@ -44,6 +44,10 @@ export default async function FacultyPanel({ userId }: { userId: string }) {
     .eq('day_of_week', today)
     .order('hour_slot', { ascending: true })
 
+  const { data: timeSlots } = await adminClient
+    .from('time_slots')
+    .select('id, name')
+
   return (
     <div className={styles.dashboardSection}>
       <h2 className={styles.sectionTitle}><GraduationCap size={24} /> Faculty Overview</h2>
@@ -61,17 +65,20 @@ export default async function FacultyPanel({ userId }: { userId: string }) {
             <Clock size={18} /> Today's Classes
           </h3>
           <ul className={styles.list}>
-            {upcomingClasses.map((cls: any) => (
+            {upcomingClasses.map((cls: any) => {
+              const timeSlot = timeSlots?.find(ts => ts.id === cls.hour_slot)
+              return (
               <li key={cls.id} className={styles.listItem}>
                 <div>
-                  <span className={styles.itemTitle}>Hour {cls.hour_slot}</span>
+                  <span className={styles.itemTitle}>{timeSlot ? timeSlot.name : `Hour ${cls.hour_slot}`}</span>
                   <div className={styles.itemSubtitle}>{cls.subjects?.name || (Array.isArray(cls.subjects) ? cls.subjects[0]?.name : '')} ({cls.subjects?.code || (Array.isArray(cls.subjects) ? cls.subjects[0]?.code : '')})</div>
                 </div>
                 <span className={styles.badge}>
                   {(cls.semesters?.departments?.name || (Array.isArray(cls.semesters?.departments) ? cls.semesters.departments[0]?.name : ''))} / {cls.semesters?.name || (Array.isArray(cls.semesters) ? cls.semesters[0]?.name : '')}
                 </span>
               </li>
-            ))}
+              )
+            })}
           </ul>
         </div>
       )}
@@ -95,7 +102,7 @@ export default async function FacultyPanel({ userId }: { userId: string }) {
       
       <div className={styles.buttonGroup}>
         <Link href="/dashboard/faculty/attendance" className={styles.actionButton}>
-          <ClipboardCheck size={18} /> Log Attendance
+          <ClipboardCheck size={18} /> Mark Attendance
         </Link>
         <Link href="/dashboard/faculty/assignments" className={styles.actionButton}>
           <FileText size={18} /> Manage Assignments
