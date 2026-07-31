@@ -53,11 +53,11 @@ export default async function LandingPage() {
             </div>
             
             <h1 className={styles.heroTitle}>
-              <span className={styles.highlightText}>MEAMS</span> Carmel
+              Carmel <span className={styles.highlightText}>MEAMS</span>
             </h1>
             
             <p className={styles.heroSubtitle}>
-              Mechanical Engineer Attendance Management System
+              Mechanical Engineering Attendance Management System
             </p>
 
             <p className={styles.heroDescription}>
