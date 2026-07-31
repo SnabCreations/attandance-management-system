@@ -28,14 +28,10 @@ export default async function LoginPage({
       <div className={styles.card}>
         <div className={styles.logosContainer}>
           <img 
-            src="https://carmelpoly.in/_next/image?url=%2Fmainlogo.png&w=2048&q=75" 
-            alt="Carmel Logo" 
+            src="/meams-logo-text.webp"
+            alt="Carmel MEAMS Logo"
             className={styles.logoImg}
-          />
-          <img 
-            src="/meams-logo.webp"
-            alt="MEAMS Logo"
-            className={styles.logoImg}
+            style={{ width: '180px', height: 'auto', marginBottom: '1rem' }}
           />
         </div>
         <h1 className={styles.title}>Welcome Back</h1>
@@ -72,10 +68,11 @@ export default async function LoginPage({
         </form>
       </div>
       <div className={styles.footer}>
-        <p>
-          &copy; {new Date().getFullYear()} Carmel Polytechnic College. All rights reserved.<br/>
-          <span>
-            Crafted by <strong>Snab Creations</strong>
+        <p style={{ lineHeight: '1.6', color: 'white', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
+          &copy; 2026 Carmel MEAMS. All Rights Reserved.<br />
+          A Product of <a href="https://carmelpoly.in" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>Carmel Polytechnic College</a>.<br/>
+          <span style={{ fontSize: '0.75rem', marginTop: '0.5rem', display: 'inline-block', opacity: 0.9 }}>
+            Designed & Developed by <strong>Snab Creations</strong>
           </span>
         </p>
       </div>

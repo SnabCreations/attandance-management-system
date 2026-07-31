@@ -21,8 +21,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Carmel AMS",
-  description: "Academic Management System for Carmel Polytechnic College",
+  title: "Carmel MEAMS",
+  description: "Mechanical Engineer Attendance Management System for Carmel Polytechnic College",
+  icons: {
+    icon: '/carmel.webp'
+  }
 };
 
 export default function RootLayout({

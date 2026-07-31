@@ -2,19 +2,22 @@ import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import Link from 'next/link'
 import styles from '../../page.module.css'
+import ExportReportButton from './ExportReportButton'
 
-export default async function FacultyReportsPage({ searchParams }: { searchParams: Promise<{ month?: string }> }) {
+export default async function FacultyReportsPage({ searchParams }: { searchParams: Promise<{ start?: string, end?: string }> }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const { month } = await searchParams
+  const { start, end } = await searchParams
   
-  // Default to current month YYYY-MM
-  const currentMonth = month || new Date().toISOString().slice(0, 7)
-  const [yearStr, monthStr] = currentMonth.split('-')
-  const startDate = new Date(parseInt(yearStr), parseInt(monthStr) - 1, 1).toISOString().split('T')[0]
-  const endDate = new Date(parseInt(yearStr), parseInt(monthStr), 0).toISOString().split('T')[0]
+  // Default to current month YYYY-MM-DD
+  const today = new Date()
+  const defaultStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]
+  const defaultEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0]
+  
+  const startDate = start || defaultStart
+  const endDate = end || defaultEnd
 
   const adminClient = createAdminClient()
   
@@ -59,17 +62,25 @@ export default async function FacultyReportsPage({ searchParams }: { searchParam
         <h2 className={styles.sectionTitle}>Monthly Teaching Report</h2>
         
         <div className={styles.fullWidthCard} style={{ marginBottom: '2rem' }}>
-          <form style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <label htmlFor="month" style={{ fontWeight: 600 }}>Select Month:</label>
+          <form style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <label htmlFor="start" style={{ fontWeight: 600 }}>Start Date:</label>
             <input 
-              type="month" 
-              id="month" 
-              name="month" 
-              defaultValue={currentMonth} 
+              type="date" 
+              id="start" 
+              name="start" 
+              defaultValue={startDate} 
+              style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)' }}
+            />
+            <label htmlFor="end" style={{ fontWeight: 600 }}>End Date:</label>
+            <input 
+              type="date" 
+              id="end" 
+              name="end" 
+              defaultValue={endDate} 
               style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)' }}
             />
             <button type="submit" className={styles.actionButton} style={{ padding: '0.5rem 1rem' }}>
-              View Report
+              Filter Report
             </button>
           </form>
         </div>
@@ -78,17 +89,20 @@ export default async function FacultyReportsPage({ searchParams }: { searchParam
           <div className={styles.statCard}>
             <h3 className={styles.statTitle}>Total Hours Taught</h3>
             <p className={styles.statNumber} style={{ fontSize: '2.5rem', color: 'var(--accent)' }}>{totalHours}</p>
-            <p className={styles.itemSubtitle}>In {currentMonth}</p>
+            <p className={styles.itemSubtitle}>From {startDate} to {endDate}</p>
           </div>
           <div className={styles.statCard}>
             <h3 className={styles.statTitle}>Total Sessions</h3>
             <p className={styles.statNumber} style={{ fontSize: '2.5rem' }}>{sessionList.length}</p>
-            <p className={styles.itemSubtitle}>In {currentMonth}</p>
+            <p className={styles.itemSubtitle}>From {startDate} to {endDate}</p>
           </div>
         </div>
 
         <div className={styles.fullWidthCard} style={{ marginTop: '2rem' }}>
-          <h3 className={styles.statTitle} style={{ marginBottom: '1.5rem' }}>Session Details</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <h3 className={styles.statTitle} style={{ margin: 0 }}>Session Details</h3>
+            <ExportReportButton sessions={sessionList} startDate={startDate} endDate={endDate} />
+          </div>
           
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>

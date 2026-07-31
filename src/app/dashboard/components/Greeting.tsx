@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import styles from '../page.module.css'
 
-export default function Greeting({ name = '' }: { name?: string }) {
+export default function Greeting({ role = 'User' }: { role?: string }) {
   const [greeting, setGreeting] = useState('Welcome')
 
   useEffect(() => {
@@ -14,8 +14,11 @@ export default function Greeting({ name = '' }: { name?: string }) {
   }, [])
 
   return (
-    <div className={styles.greetingContainer}>
-      <h1 className={styles.greetingText}>Hi{name ? ` ${name}` : ''}, {greeting}</h1>
+    <div className={styles.greetingContainer} style={{ marginBottom: '2rem' }}>
+      <h1 className={styles.greetingText} style={{ fontSize: '1.75rem', fontWeight: '700' }}>
+        {greeting}, {role} 👋
+      </h1>
+      <p style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Welcome back! Here's today's overview.</p>
     </div>
   )
 }

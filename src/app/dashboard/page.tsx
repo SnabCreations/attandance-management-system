@@ -34,13 +34,15 @@ export default async function DashboardPage() {
     )
   }
 
-  const name = user.email ? user.email.split('@')[0] : 'User'
-  // Capitalize first letter
-  const formattedName = name.charAt(0).toUpperCase() + name.slice(1)
+  const primaryRole = roles.includes('Admin') ? 'Admin' :
+                      roles.includes('Tutor') ? 'Tutor' :
+                      roles.includes('Faculty') ? 'Faculty' :
+                      roles.includes('Parent') ? 'Parent' :
+                      roles.includes('Student') ? 'Student' : 'User'
 
   return (
     <div className={styles.container}>
-      <Greeting name={formattedName} />
+      <Greeting role={primaryRole} />
       {roles.includes('Admin') && <AdminPanel />}
       {roles.includes('Tutor') && <TutorPanel userId={user.id} />}
       {roles.includes('Faculty') && <FacultyPanel userId={user.id} />}

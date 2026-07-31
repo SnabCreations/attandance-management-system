@@ -19,7 +19,7 @@ export async function submitAttendance(formData: FormData, students: any[]) {
   
   // Build batch insert array
   const attendanceRecords = students.map((student) => {
-    const isAbsent = formData.get(`absent_${student.id}`) === 'on'
+    const isPresent = formData.get(`present_${student.id}`) === 'on'
     
     return {
       student_id: student.id,
@@ -27,7 +27,7 @@ export async function submitAttendance(formData: FormData, students: any[]) {
       date,
       hours,
       is_extra_hours: is_extra,
-      status: isAbsent ? 'Absent' : 'Present',
+      status: isPresent ? 'Present' : 'Absent',
       marked_by: user.id
     }
   })

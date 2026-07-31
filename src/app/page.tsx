@@ -28,14 +28,9 @@ export default async function LandingPage() {
       <nav className={styles.navbar}>
         <div className={styles.navLogo}>
           <img 
-            src="https://carmelpoly.in/_next/image?url=%2Fmainlogo.png&w=2048&q=75" 
-            alt="Carmel Logo" 
-            className={styles.logoImageSmall}
-          />
-          <img 
-            src="/meams-logo.webp"
-            alt="MEAMS Logo"
-            className={styles.platformLogoSmall}
+            src="/meams-logo-text.webp"
+            alt="Carmel MEAMS Logo"
+            style={{ height: '40px', width: 'auto' }}
           />
         </div>
         <div>
@@ -51,14 +46,9 @@ export default async function LandingPage() {
           <div className={styles.heroLeft}>
             <div className={styles.heroLogoContainer}>
               <img 
-                src="https://carmelpoly.in/_next/image?url=%2Fmainlogo.png&w=2048&q=75" 
-                alt="Carmel Logo" 
-                className={styles.logoImageLarge}
-              />
-              <img 
-                src="/meams-logo.webp"
-                alt="MEAMS Logo"
-                className={styles.platformLogoLarge}
+                src="/meams-logo-text.webp"
+                alt="Carmel MEAMS Logo"
+                style={{ height: '80px', width: 'auto', marginBottom: '1.5rem' }}
               />
             </div>
             
@@ -142,10 +132,11 @@ export default async function LandingPage() {
       
       {/* Footer */}
       <footer className={styles.footer}>
-        <p>
-          &copy; {new Date().getFullYear()} <a href="https://carmelpoly.in" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>Carmel Polytechnic College</a>. All rights reserved.<br/>
-          <span style={{ fontSize: '0.65rem', marginTop: '0.5rem', display: 'inline-block', opacity: 0.8 }}>
-            Crafted by <strong>Snab Creations</strong>
+        <p style={{ lineHeight: '1.6' }}>
+          &copy; 2026 Carmel MEAMS. All Rights Reserved.<br />
+          A Product of <a href="https://carmelpoly.in" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>Carmel Polytechnic College</a>.<br/>
+          <span style={{ fontSize: '0.75rem', marginTop: '0.5rem', display: 'inline-block', opacity: 0.8 }}>
+            Designed & Developed by <strong>Snab Creations</strong>
           </span>
         </p>
       </footer>
