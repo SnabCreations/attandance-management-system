@@ -18,7 +18,7 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
   const [sortOrder, setSortOrder] = useState<'asc'|'desc'>('asc')
   
   const [presentStudents, setPresentStudents] = useState<Set<number>>(new Set())
-  const [markedHours, setMarkedHours] = useState<{ slotId: number, facultyName: string }[]>([])
+  const [markedHours, setMarkedHours] = useState<{ slotId: number, facultyName: string, subjectName: string }[]>([])
 
   const supabase = createClient()
 
@@ -53,7 +53,7 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
 
   useEffect(() => {
     async function fetchMarkedHours() {
-      if (!selectedSubject || !date) {
+      if (!currentAssignment || !date) {
         setMarkedHours([])
         return
       }
@@ -62,24 +62,27 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
         .from('faculty_teaching_logs')
         .select(`
           time_slot_id,
-          users (email, raw_user_meta_data)
+          users (email, raw_user_meta_data),
+          subjects!inner (name, semester_id)
         `)
-        .eq('subject_id', parseInt(selectedSubject))
+        .eq('subjects.semester_id', currentAssignment.semester_id)
         .eq('date', date)
         
       if (data && !error) {
         const hours = data.map((log: any) => {
           const facultyName = log.users?.raw_user_meta_data?.name || log.users?.email || 'Faculty'
+          const subjectName = log.subjects?.name || 'Subject'
           return {
             slotId: log.time_slot_id,
-            facultyName: facultyName
+            facultyName: facultyName,
+            subjectName: subjectName
           }
         })
         setMarkedHours(hours)
       }
     }
     fetchMarkedHours()
-  }, [selectedSubject, date])
+  }, [selectedSubject, date, currentAssignment])
 
   async function handleSubmit(formData: FormData) {
     setIsPending(true)
@@ -236,8 +239,8 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
                     <span className={styles.timeSlotName}>{slot.name}</span>
                     <span className={styles.timeSlotTime}>{slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)}</span>
                     {isMarked && (
-                      <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
-                        Marked by: {markedBy.map(m => m.facultyName).join(', ')}
+                      <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block', lineHeight: 1.2 }}>
+                        Marked by: {markedBy.map(m => `${m.facultyName} (${m.subjectName})`).join(', ')}
                       </span>
                     )}
                   </div>

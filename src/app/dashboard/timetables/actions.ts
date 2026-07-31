@@ -162,3 +162,53 @@ export async function bulkUploadTimetable(semester_id: number, entries: any[]) {
 
   return { count: insertedCount }
 }
+
+export async function checkTimetableConflicts(semester_id: number, entries: any[]) {
+  const supabase = await createClient()
+  
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+  
+  const { data: callerProfile } = await supabase
+    .from('users')
+    .select('roles')
+    .eq('id', user.id)
+    .single()
+    
+  if (!callerProfile?.roles?.includes('Admin') && !callerProfile?.roles?.includes('Tutor')) {
+    return { error: 'Unauthorized' }
+  }
+
+  // Fetch existing slots for this semester
+  const { data: existingSlots } = await supabase
+    .from('timetables')
+    .select(`
+      day_of_week, 
+      hour_slot, 
+      faculty_id,
+      users (email, raw_user_meta_data),
+      subjects (code, name)
+    `)
+    .eq('semester_id', semester_id)
+
+  if (!existingSlots || existingSlots.length === 0) {
+    return { conflicts: [] }
+  }
+
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+  const conflicts: string[] = []
+
+  for (const entry of entries) {
+    const conflict = existingSlots.find(s => s.day_of_week === entry.day_of_week && s.hour_slot === entry.hour_slot)
+    
+    if (conflict) {
+      const dayName = days[entry.day_of_week - 1] || 'Unknown Day'
+      const facultyName = conflict.users?.raw_user_meta_data?.name || conflict.users?.email || 'Unknown Faculty'
+      const subjectName = conflict.subjects?.name || conflict.subjects?.code || 'Unknown Subject'
+      
+      conflicts.push(`${dayName} Hour ${entry.hour_slot} is currently assigned to ${facultyName} (${subjectName})`)
+    }
+  }
+
+  return { conflicts }
+}

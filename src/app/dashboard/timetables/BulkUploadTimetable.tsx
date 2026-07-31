@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Papa from 'papaparse'
 import { Upload, Download } from 'lucide-react'
-import { bulkUploadTimetable } from './actions'
+import { bulkUploadTimetable, checkTimetableConflicts } from './actions'
 
 export default function BulkUploadTimetable({ semesterId, onUploadSuccess }: { semesterId: number, onUploadSuccess?: () => void }) {
   const [isUploading, setIsUploading] = useState(false)
@@ -51,6 +51,28 @@ export default function BulkUploadTimetable({ semesterId, onUploadSuccess }: { s
             alert('No valid entries found in the CSV. Please check the sample format.')
             setIsUploading(false)
             return
+          }
+
+          // Check for conflicts first
+          const checkResult = await checkTimetableConflicts(semesterId, entries)
+          
+          if (checkResult?.error) {
+            alert(`Error checking conflicts: ${checkResult.error}`)
+            setIsUploading(false)
+            return
+          }
+          
+          if (checkResult?.conflicts && checkResult.conflicts.length > 0) {
+            const conflictMsg = `Found ${checkResult.conflicts.length} conflict(s):\n\n` + 
+              checkResult.conflicts.slice(0, 5).join('\n') + 
+              (checkResult.conflicts.length > 5 ? `\n...and ${checkResult.conflicts.length - 5} more.` : '') + 
+              `\n\nDo you want to overwrite these existing slots?`
+              
+            if (!confirm(conflictMsg)) {
+              setIsUploading(false)
+              e.target.value = ''
+              return
+            }
           }
 
           const result = await bulkUploadTimetable(semesterId, entries)
