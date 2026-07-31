@@ -47,9 +47,10 @@ export default function DashboardShell({
           <div className={styles.pageWrapper}>
             {children}
           </div>
-          <footer className={styles.dashboardFooter}>
-            &copy; {new Date().getFullYear()} Carmel Polytechnic College. All rights reserved.<br/>
-            <span>Crafted by <strong>Snab Creations</strong></span>
+          <footer className={styles.dashboardFooter} style={{ fontSize: '0.75rem', opacity: 0.5, lineHeight: '1.4' }}>
+            &copy; 2026 Carmel MEAMS. All Rights Reserved.<br/>
+            A Product of Carmel Polytechnic College<br/>
+            Designed &amp; Developed by Snab Creations
           </footer>
         </div>
       </main>

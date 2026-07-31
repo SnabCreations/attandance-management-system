@@ -6,11 +6,11 @@
 }
 
 .card {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
   padding: 1.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .card h2 {
@@ -18,7 +18,7 @@
   font-weight: 600;
   margin-top: 0;
   margin-bottom: 1.5rem;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .form {
@@ -36,17 +36,19 @@
 .inputGroup label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .inputGroup input,
 .select {
+  color: var(--text-primary);
+  color: var(--text-primary);
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-dark);
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s;
-  background-color: #ffffff;
+  background-color: var(--bg-surface);
 }
 
 .inputGroup input:focus,
@@ -87,8 +89,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
 }
 
@@ -100,7 +102,7 @@
 
 .subName {
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .badge {
@@ -114,7 +116,7 @@
 
 .subId {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted);
   background-color: #e5e7eb;
   padding: 0.25rem 0.5rem;
   border-radius: 9999px;

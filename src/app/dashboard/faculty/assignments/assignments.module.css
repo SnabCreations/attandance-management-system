@@ -227,12 +227,12 @@
 }
 
 .backLink:hover {
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .tableContainer {
   overflow-x: auto;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
 }
 
@@ -243,8 +243,8 @@
 }
 
 .table th {
-  background-color: #f9fafb;
-  color: #6b7280;
+  background-color: var(--bg-canvas);
+  color: var(--text-muted);
   font-weight: 600;
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -255,30 +255,30 @@
 .table td {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid #e5e7eb;
-  color: #374151;
+  color: var(--text-secondary);
   font-size: 0.875rem;
 }
 
 .table tbody tr:hover {
-  background-color: #f9fafb;
+  background-color: var(--bg-canvas);
 }
 
 .rollNo {
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .selectSmall {
   padding: 0.5rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-dark);
   border-radius: 6px;
   font-size: 0.875rem;
-  background-color: #ffffff;
+  background-color: var(--bg-surface);
 }
 
 .inputSmall {
   padding: 0.5rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-dark);
   border-radius: 6px;
   font-size: 0.875rem;
   width: 80px;

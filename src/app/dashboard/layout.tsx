@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
 import DashboardShell from './DashboardShell'
+import SidebarSearch from './components/SidebarSearch'
 import AvatarUpload from './components/AvatarUpload'
 import { 
   LayoutDashboard, Users, GraduationCap, Megaphone, Clock, BookOpen, 
@@ -50,6 +51,7 @@ export default async function DashboardLayout({
         </div>
         
         <nav className={styles.sidebarNav}>
+          <SidebarSearch />
           <Link href="/dashboard" className={styles.navLink}>
             <LayoutDashboard size={18} /> Dashboard Home
           </Link>
@@ -119,6 +121,11 @@ export default async function DashboardLayout({
         </nav>
 
         <div className={styles.sidebarFooter}>
+          <div style={{ padding: '0 1rem 1rem 1rem', fontSize: '0.7rem', opacity: 0.5, textAlign: 'center', lineHeight: '1.4', color: 'var(--text-primary)' }}>
+            &copy; 2026 Carmel MEAMS. All Rights Reserved.<br/>
+            A Product of Carmel Polytechnic College<br/>
+            Designed &amp; Developed by Snab Creations
+          </div>
           <AvatarUpload userId={user.id} initialAvatarUrl={userProfile?.avatar_url || null} />
           <div style={{ flex: 1, overflow: 'hidden' }}>
             <div className={styles.userEmail} style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{user.email}</div>

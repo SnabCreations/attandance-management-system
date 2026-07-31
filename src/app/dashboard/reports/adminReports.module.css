@@ -8,7 +8,7 @@
 .title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -19,8 +19,8 @@
 }
 
 .statCard {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
@@ -38,7 +38,7 @@
 .statCard h3 {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0 0 1rem 0;
@@ -47,7 +47,7 @@
 .value {
   font-size: 3rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   line-height: 1;
 }
 
@@ -60,22 +60,22 @@
 }
 
 .card {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.5rem;
 }
 
 .card h2 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .subtitle {
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.875rem;
   margin-bottom: 2rem;
 }

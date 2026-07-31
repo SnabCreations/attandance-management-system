@@ -2,9 +2,18 @@
   display: flex;
   height: 100vh;
   overflow: hidden;
-  background-color: #f8fafc; /* subtle slate-50 background */
-  background-image: radial-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px);
-  background-size: 20px 20px;
+  background-color: #64748b; /* Slate 500 for high contrast with white cards */
+  position: relative;
+}
+
+.layout::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('/carmel-college-image.jpg') center center / cover no-repeat fixed;
+  opacity: 0.15;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .sidebar {
@@ -134,6 +143,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .header {

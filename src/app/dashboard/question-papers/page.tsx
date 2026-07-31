@@ -18,8 +18,9 @@ export default async function QuestionPapersPage() {
   const isFacultyOrAdmin = roles.includes('Admin') || roles.includes('Faculty')
 
   // Fetch initial data
-  const { data: subjects } = await supabase.from('subjects').select('id, name').order('name')
-  const { data: semesters } = await supabase.from('semesters').select('id, name').order('name')
+  const { data: departments } = await supabase.from('departments').select('id, name').order('name')
+  const { data: subjects } = await supabase.from('subjects').select('id, name, semester_id').order('name')
+  const { data: semesters } = await supabase.from('semesters').select('id, name, department_id').order('name')
   
   const { data: questionPapers } = await supabase
     .from('question_papers')
@@ -36,6 +37,7 @@ export default async function QuestionPapersPage() {
   return (
     <QuestionPapersClient 
       initialPapers={questionPapers || []}
+      departments={departments || []}
       subjects={subjects || []}
       semesters={semesters || []}
       isFacultyOrAdmin={isFacultyOrAdmin}

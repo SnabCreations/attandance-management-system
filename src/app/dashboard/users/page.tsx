@@ -3,6 +3,7 @@ import UserManagementForm from './UserManagementForm'
 import DeleteButton from './DeleteButton'
 import EditUserModal from './EditUserModal'
 import BulkUserUpload from './BulkUserUpload'
+import ResetPasswordButton from './ResetPasswordButton'
 import styles from './users.module.css'
 import { deleteUser, toggleBlockUser, resetUserPassword } from './actions'
 
@@ -111,13 +112,7 @@ export default async function UsersPage() {
                           {user.isBlocked ? 'Unblock' : 'Block'}
                         </button>
                       </form>
-                      <form action={resetUserPassword}>
-                        <input type="hidden" name="user_id" value={user.id} />
-                        <input type="hidden" name="email" value={user.email} />
-                        <button type="submit" style={{ padding: '0.375rem 0.75rem', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.875rem' }} title="Reset to default password">
-                          Reset Password
-                        </button>
-                      </form>
+                      <ResetPasswordButton userId={user.id} email={user.email} />
                       <form action={deleteUser}>
                         <input type="hidden" name="user_id" value={user.id} />
                         <DeleteButton email={user.email} />

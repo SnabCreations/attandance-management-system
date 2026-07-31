@@ -46,7 +46,8 @@ export default async function AdminStudentRegistryPage({
       roll_no,
       semester_id,
       department_id,
-      semesters (name, departments(name)),
+      semesters (name),
+      departments (name),
       parent_id,
       parent:users!students_parent_id_fkey (email, avatar_url),
       updater:users!students_updated_by_fkey (email)
@@ -151,7 +152,7 @@ export default async function AdminStudentRegistryPage({
                   </td>
                   <td>
                     <span className={styles.badge}>
-                      {student.semesters?.departments?.name} / {student.semesters?.name}
+                      {student.departments?.name} / {student.semesters?.name}
                     </span>
                   </td>
                   <td>

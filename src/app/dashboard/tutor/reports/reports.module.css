@@ -12,21 +12,21 @@
 .title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .subtitle {
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0;
 }
 
 .card {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.5rem;
 }
 
 .controls {
@@ -48,15 +48,16 @@
 .inputGroup label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .select {
+  color: var(--text-primary);
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-dark);
   border-radius: 8px;
   font-size: 1rem;
-  background-color: #ffffff;
+  background-color: var(--bg-surface);
   transition: border-color 0.2s;
 }
 
@@ -108,8 +109,8 @@
 }
 
 .table th {
-  background-color: #f9fafb;
-  color: #6b7280;
+  background-color: var(--bg-canvas);
+  color: var(--text-muted);
   font-weight: 600;
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -120,17 +121,17 @@
 .table td {
   padding: 1rem;
   border-bottom: 1px solid #e5e7eb;
-  color: #374151;
+  color: var(--text-secondary);
   font-size: 0.875rem;
 }
 
 .table tbody tr:hover {
-  background-color: #f9fafb;
+  background-color: var(--bg-canvas);
 }
 
 .rollNo {
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .studentName {
@@ -176,7 +177,7 @@
 }
 
 .emptyState {
-  color: #6b7280;
+  color: var(--text-muted);
   font-style: italic;
   text-align: center;
   padding: 2rem;

@@ -113,7 +113,11 @@ export default async function AttendancePage() {
       <div className={styles.container}>
         <div className={styles.card}>
           <h2>Log Attendance</h2>
-          <p className={styles.emptyState}>You have no subjects assigned to you. Please contact the administrator.</p>
+          <p className={styles.emptyState}>
+            {isAdmin 
+              ? "There are no subjects in the system. Create subjects first to log attendance."
+              : "You have no subjects assigned to you. Please contact the administrator."}
+          </p>
         </div>
       </div>
     )

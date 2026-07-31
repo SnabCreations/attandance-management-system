@@ -67,7 +67,7 @@ export default async function TimetablesPage({ searchParams }: { searchParams: P
           <h2>Timetable Management</h2>
           <p>Assign subjects and faculty to specific hour slots for each day.</p>
         </div>
-        <form style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <form action="/dashboard/timetables" method="GET" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <label htmlFor="dept" style={{ fontWeight: 500, fontSize: '0.875rem' }}>Filter Department:</label>
           <select 
             name="dept" 

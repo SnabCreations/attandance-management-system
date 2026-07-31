@@ -259,4 +259,5 @@ export async function resetUserPassword(formData: FormData) {
   await adminClient.from('users').update({ force_password_reset: true }).eq('id', target_user_id)
   
   revalidatePath('/dashboard/users')
+  return { password: defaultPassword }
 }

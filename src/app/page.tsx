@@ -48,7 +48,7 @@ export default async function LandingPage() {
               <img 
                 src="/meams-logo-text.webp"
                 alt="Carmel MEAMS Logo"
-                style={{ height: '80px', width: 'auto', marginBottom: '1.5rem' }}
+                style={{ height: '120px', width: 'auto' }}
               />
             </div>
             

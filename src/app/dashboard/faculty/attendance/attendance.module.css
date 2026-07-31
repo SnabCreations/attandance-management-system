@@ -48,6 +48,7 @@
 
 .input,
 .select {
+  color: var(--text-primary);
   padding: 0.75rem;
   border: 1px solid var(--border-dark);
   border-radius: var(--radius-md);
@@ -442,6 +443,6 @@
 }
 
 .emptyState {
-  color: #6b7280;
+  color: var(--text-muted);
   font-style: italic;
 }
