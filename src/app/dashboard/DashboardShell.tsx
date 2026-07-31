@@ -47,10 +47,31 @@ export default function DashboardShell({
           <div className={styles.pageWrapper}>
             {children}
           </div>
-          <footer className={styles.dashboardFooter} style={{ fontSize: '0.65rem', lineHeight: '1.4', color: '#f8fafc', fontWeight: 500, paddingBottom: '1rem' }}>
-            &copy; 2026 Carmel MEAMS. All Rights Reserved.<br/>
-            A Product of Carmel Polytechnic College<br/>
-            Designed &amp; Developed by Snab Creations
+          {/* Solid Color Overlay (Makes the background just a hint) */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.75)', // Slightly more transparent so image shows
+            zIndex: -1,
+          }} />
+          <footer className={styles.dashboardFooter} style={{ 
+            fontSize: '0.65rem', 
+            lineHeight: '1.4', 
+            color: '#f8fafc', 
+            fontWeight: 500, 
+            paddingBottom: '1rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            width: '100%'
+          }}>
+            <div style={{ textAlign: 'left' }}>
+              &copy; 2026 Carmel MEAMS. All Rights Reserved.<br/>
+              A Product of Carmel Polytechnic College
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              Designed &amp; Developed by Snab Creations
+            </div>
           </footer>
         </div>
       </main>

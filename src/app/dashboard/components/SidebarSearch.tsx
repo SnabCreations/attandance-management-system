@@ -9,7 +9,7 @@ export default function SidebarSearch() {
   useEffect(() => {
     // Find all nav links and sections in the sidebar
     const links = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>
-    const sections = document.querySelectorAll('nav div') as NodeListOf<HTMLDivElement>
+    const sections = Array.from(document.querySelectorAll('nav div')).filter(div => div.id !== 'sidebar-search-container') as HTMLDivElement[]
 
     if (query.trim() === '') {
       // Show everything by removing inline styles
@@ -39,7 +39,7 @@ export default function SidebarSearch() {
   }, [query])
 
   return (
-    <div style={{ padding: '0 1rem 1rem 1rem', position: 'relative' }}>
+    <div id="sidebar-search-container" style={{ padding: '0 1rem 1rem 1rem', position: 'relative' }}>
       <Search 
         size={16} 
         style={{ 

@@ -80,3 +80,37 @@
 .saveBtn:hover {
   background-color: var(--brand-primary-hover);
 }
+
+/* Capturing styles for html2canvas */
+.capturing .gridControls {
+  display: none !important;
+}
+
+.capturing .saveBtn {
+  display: none !important;
+}
+
+.capturing select {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  text-align: center;
+  color: #0f172a;
+}
+
+.capturing .table th,
+.capturing .table td {
+  border-color: #cbd5e1;
+}
+
+.capturing .table th {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.capturing {
+  padding: 2rem !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}

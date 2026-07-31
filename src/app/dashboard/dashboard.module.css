@@ -11,7 +11,7 @@
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   background: url('/carmel-college-image.jpg') center center / cover no-repeat fixed;
-  opacity: 0.15;
+  opacity: 0.25;
   z-index: 0;
   pointer-events: none;
 }
@@ -173,6 +173,13 @@
 }
 
 .pageWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.pageWrapper > div {
+  max-width: none !important;
   flex: 1;
 }
 

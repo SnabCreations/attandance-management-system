@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --bg-canvas: #f8fafc;
-  --bg-surface: #ffffff;
+  --bg-canvas: transparent;
+  --bg-surface: rgba(255, 255, 255, 0.92);
   
   --text-primary: #0f172a;
   --text-secondary: #475569;
@@ -34,14 +34,14 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-canvas: #0f172a;
-    --bg-surface: #1e293b;
+    --bg-canvas: rgba(15, 23, 42, 0.4);
+    --bg-surface: rgba(30, 41, 59, 0.85);
     --text-primary: #f8fafc;
     --text-secondary: #cbd5e1;
     --text-muted: #64748b;
-    --border-light: #1e293b;
-    --border-color: #334155;
-    --border-dark: #475569;
+    --border-light: rgba(30, 41, 59, 0.5);
+    --border-color: rgba(51, 65, 85, 0.6);
+    --border-dark: rgba(71, 85, 105, 0.6);
     --shadow-card: 0px 4px 20px rgba(0, 0, 0, 0.2);
   }
 }
