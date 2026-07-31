@@ -43,3 +43,24 @@ export async function bulkAddSubjects(data: any[], semester_id: number) {
   revalidatePath('/dashboard/subjects')
   return { count: inserts.length }
 }
+
+export async function editSubject(id: number, name: string, code: string) {
+  const supabase = await createClient()
+  if (!id || !name) return
+  
+  const { error } = await supabase.from('subjects').update({ name, code }).eq('id', id)
+  if (error) console.error('Error updating subject:', error)
+  
+  revalidatePath('/dashboard/subjects')
+}
+
+export async function deleteSubject(id: number) {
+  const supabase = await createClient()
+  if (!id) return
+  
+  // Might fail if there are dependencies (e.g. timetables, question papers)
+  const { error } = await supabase.from('subjects').delete().eq('id', id)
+  if (error) console.error('Error deleting subject:', error)
+  
+  revalidatePath('/dashboard/subjects')
+}

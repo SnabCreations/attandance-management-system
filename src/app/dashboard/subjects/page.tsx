@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import styles from './subjects.module.css'
 import { addSubject } from './actions'
 import BulkSubjectUpload from './BulkSubjectUpload'
+import SubjectRow from './SubjectRow'
 
 export default async function SubjectsPage() {
   const supabase = await createClient()
@@ -91,12 +92,7 @@ export default async function SubjectsPage() {
                 <h3 className={styles.semesterTitle}>{semesterName}</h3>
                 <ul className={styles.list}>
                   {groupedSubjects[semesterName].map((sub: any) => (
-                    <li key={sub.id} className={styles.listItem}>
-                      <div className={styles.subInfo}>
-                        <span className={styles.subCode}>{sub.code || `SUB-${sub.id}`}</span>
-                        <span className={styles.subName}>{sub.name}</span>
-                      </div>
-                    </li>
+                    <SubjectRow key={sub.id} sub={sub} />
                   ))}
                 </ul>
               </div>

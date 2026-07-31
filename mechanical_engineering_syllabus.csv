@@ -1,0 +1,71 @@
+Semester,Sl. No.,Course Category,Course Code,Course Name,L,T,P,Total Contact Hours,CA,ESA,Total Marks,Exam Type,Evaluation Mode,Credits
+Semester 1,1,Humanities & Social Sciences,1001,Communication Skills in English,4,0,0,4,50,75,125,T,B,4
+Semester 1,2,Basic Science,1002,Mathematics I,5,0,0,5,50,75,125,T,B,5
+Semester 1,3,Basic Science,1003,Applied Physics I,3,0,0,3,50,75,125,T,B,3
+Semester 1,4,Basic Science,1004,Applied Chemistry,3,0,0,3,50,75,125,T,B,3
+Semester 1,5,Engineering Science,1005,Engineering Graphics,0,0,3,3,50,75,125,D,B,1.5
+Semester 1,6,Basic Science,2006,Applied Physics Lab,0,0,2,2,^,^,^,P,I,^
+Semester 1,7,Basic Science,1007,Applied Chemistry Lab,0,0,2,2,75,50,125,P,I,1
+Semester 1,8,Engineering Science,1008,Introduction to IT systems Lab,1,0,2,3,75,50,125,P,I,2
+Semester 1,9,Engineering Science,2009,Engineering Workshop Practice,0,0,3,3,^,^,^,P,I,^
+Semester 1,10,Humanities & Social Sciences,1009,Sports and Yoga,0,0,2,2,75,50,125,P,I,1
+Semester 2,1,Basic Science,2002,Mathematics II,4,0,0,4,50,75,125,T,B,4
+Semester 2,2,Basic Science,2003,Applied Physics II,3,0,0,3,50,75,125,T,B,3
+Semester 2,3,Common Courses,2001,Environmental Science,3,0,0,3,50,75,125,T,I,0
+Semester 2,4,Engineering Science,2021,Engineering Mechanics,3,0,0,3,50,75,125,T,B,3
+Semester 2,5,Engineering Science,2022,Manufacturing Technology,3,0,0,3,50,75,125,T,B,3
+Semester 2,6,Humanities & Social Sciences,2008,Communication Skills in English Lab,0,0,3,3,75,50,125,P,I,1.5
+Semester 2,7,Basic Science,2006,Applied Physics Lab,0,0,2,2,75,50,125,P,I,1
+Semester 2,8,Engineering Science,2029,Engineering Mechanics Lab,0,0,3,3,75,50,125,P,I,0
+Semester 2,9,Engineering Science,2028,Basic CAD Lab,0,0,3,3,75,50,125,P,I,0
+Semester 2,10,Engineering Science,2009,Engineering Workshop Practice,0,0,3,3,75,50,125,P,I,1.5
+Summer Internship I,1,Common Courses,3009,Internship I (3 Weeks),-,-,-,-,0,75,75,P,I,2
+Semester 3,1,Programme core course,3021,Strength of Materials,2,1,0,3,50,75,125,T,B,3
+Semester 3,2,Programme core course,3022,Material Science and Metrology,2,1,0,3,50,75,125,T,B,3
+Semester 3,3,Programme core course,3023,Machine Tools,3,1,0,4,50,75,125,T,B,4
+Semester 3,4,Programme core course,3024,Fundamentals of Electrical Engineering,3,1,0,4,50,75,125,T,B,4
+Semester 3,5,Programme core course,3025,Machine Drawing,0,0,3,3,50,75,125,D,B,1.5
+Semester 3,6,Programme core course,3026,Material Testing and Metallography Lab,0,0,3,3,75,50,125,P,B,1.5
+Semester 3,7,Programme core course,3027,Mechanical Workshop III,0,0,3,3,75,50,125,P,B,1.5
+Semester 3,8,Programme core course,3028,Electrical and Electronics Lab,0,0,3,3,75,50,125,P,B,1.5
+Semester 3,9,Programme core course,3029,Advanced CADD Lab,0,0,4,4,75,50,125,P,I,0
+Semester 4,1,Programme core course,4021,Thermal Engineering,3,1,0,4,50,75,125,T,B,4
+Semester 4,2,Programme core course,4022,Fluid Mechanics and Hydraulic Machines,3,1,0,4,50,75,125,T,B,4
+Semester 4,3,Programme core course,4023,Automobile Engineering,3,1,0,4,50,75,125,T,B,4
+Semester 4,4,Common Courses,4001,Community Skills in Indian knowledge system,2,0,0,2,50,75,125,T,I,0
+Semester 4,5,Programme core course,4024,Industrial Engineering,3,0,0,3,50,75,125,T,I,0
+Semester 4,6,Programme core course,4027,Thermal Engineering Lab,0,0,3,3,75,50,125,P,B,1.5
+Semester 4,7,Programme core course,4028,Fluid Mechanics Lab (Mechanical),0,0,3,3,75,50,125,P,B,1.5
+Semester 4,8,Programme core course,4029,Mechanical Workshop IV,0,0,3,3,75,50,125,P,B,1.5
+Semester 4,9,Minor project,4009,Minor Project,0,0,4,4,0,75,75,P,I,2
+Summer Internship II,1,Common Courses,5009,Internship II (4 Weeks),-,-,-,-,0,75,75,P,I,3
+Semester 5,1,Common Courses,5001,Industrial Management and Safety,3,1,0,4,50,75,125,T,I,0
+Semester 5,2,Programme core course,5021,Design Of Machine Elements,3,1,0,4,50,75,125,T,B,4
+Semester 5,3,Programme core course,5022,Refrigeration and Air conditioning,3,1,0,4,50,75,125,T,B,4
+Semester 5,4 (Elective A),Program Elective course,5023A,Modern Production Process,4,0,0,4,50,75,125,T,B,4
+Semester 5,4 (Elective B),Program Elective course,5023B,Material Handling,4,0,0,4,50,75,125,T,B,4
+Semester 5,4 (Elective C),Program Elective course,5023C,Power Plant Engineering,4,0,0,4,50,75,125,T,B,4
+Semester 5,5,Programme core course,5027,Machine Shop Practice,0,0,3,3,75,50,125,P,B,1.5
+Semester 5,6,Programme core course,5028,Hydraulic Machines Lab,0,0,3,3,75,50,125,P,B,1.5
+Semester 5,7,Program Elective course,5029,Automotive Lab,0,0,3,3,75,50,125,P,B,1.5
+Semester 5,8,Seminar,5008,Seminar,0,0,2,2,0,75,75,P,I,1
+Semester 5,9,Major Project,6009,Major Project,0,0,3,3,0,0,0,P,I,0
+Semester 6 (Normal Pathway),1,Humanities & Social Sciences,6001,Entrepreneurship and Startup,3,1,0,4,50,75,125,T,I,4
+Semester 6 (Normal Pathway),2 (Elective A),Program Elective course,6021A,Mechatronics,3,1,0,4,50,75,125,T,B,4
+Semester 6 (Normal Pathway),2 (Elective B),Program Elective course,6021B,Computer Integrated Manufacturing,3,1,0,4,50,75,125,T,B,4
+Semester 6 (Normal Pathway),2 (Elective C),Program Elective course,6031D,Electric Vehicles,3,1,0,4,50,75,125,T,B,4
+Semester 6 (Normal Pathway),2 (Elective D),Program Elective course,6051A,Electric and Hybrid Vehicles,4,0,0,4,50,75,125,T,B,4
+Semester 6 (Normal Pathway),3 (Open Elective A),Open Elective course,6022A,Computer Aided Design and Manufacturing,4,0,0,4,50,75,125,T,I,4
+Semester 6 (Normal Pathway),3 (Open Elective B),Open Elective course,6022B,Operation Research,4,0,0,4,50,75,125,T,I,4
+Semester 6 (Normal Pathway),3 (Open Elective C),Open Elective course,6022C,Renewable Energy Technologies,4,0,0,4,50,75,125,T,I,4
+Semester 6 (Normal Pathway),3 (Open Elective D),Open Elective course,6022D,Product Design,4,0,0,4,50,75,125,T,I,4
+Semester 6 (Normal Pathway),4,Common Courses,6002,Indian Constitution,2,0,0,2,50,75,125,T,I,0
+Semester 6 (Normal Pathway),5,Programme core course,6027,Production Software Lab,0,1,3,4,75,50,125,P,I,2.5
+Semester 6 (Normal Pathway),6,Programme core course,6028,Refrigeration and Airconditioning Lab,0,0,3,3,75,50,125,P,I,1.5
+Semester 6 (Normal Pathway),7,Program Elective course,6029,Advanced Machine Tools Lab,0,0,3,3,75,50,125,P,B,1.5
+Semester 6 (Normal Pathway),8,Major Project,6009,Major Project,0,0,6,6,75,50,125,P,I,4
+Semester 6 (Internship Pathway),1,Humanities & Social Sciences,6001,Entrepreneurship and Startup,3,1,0,4,50,75,125,T,I,4
+Semester 6 (Internship Pathway),2,Common Courses,6002,Indian Constitution,2,0,0,2,50,75,125,T,I,0
+Semester 6 (Internship Pathway),3,Programme core course,6027,Production Software Lab,0,1,3,4,75,50,125,P,I,2.5
+Semester 6 (Internship Pathway),4,Programme core course,6028,Refrigeration and Airconditioning Lab,0,0,3,3,75,50,125,P,I,1.5
+Semester 6 (Internship Pathway),5,Internship,6007,Internship (4-6 months per semester),-,-,-,-,250,250,500,P,I,13.5
