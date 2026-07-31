@@ -203,8 +203,8 @@ export async function checkTimetableConflicts(semester_id: number, entries: any[
     
     if (conflict) {
       const dayName = days[entry.day_of_week - 1] || 'Unknown Day'
-      const facultyName = conflict.users?.raw_user_meta_data?.name || conflict.users?.email || 'Unknown Faculty'
-      const subjectName = conflict.subjects?.name || conflict.subjects?.code || 'Unknown Subject'
+      const facultyName = (conflict.users as any)?.raw_user_meta_data?.name || (conflict.users as any)?.email || 'Unknown Faculty'
+      const subjectName = (conflict.subjects as any)?.name || (conflict.subjects as any)?.code || 'Unknown Subject'
       
       conflicts.push(`${dayName} Hour ${entry.hour_slot} is currently assigned to ${facultyName} (${subjectName})`)
     }

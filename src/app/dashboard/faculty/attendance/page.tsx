@@ -38,9 +38,9 @@ export default async function AttendancePage() {
         subject_name: s.name,
         semester_id: s.semester_id,
         semester_name: s.semesters?.name || 'Unknown',
-        department_id: s.semesters?.departments?.id,
-        department_name: s.semesters?.departments?.name || 'Unknown',
-        subjects: { name: `${s.semesters?.departments?.name || ''} - ${s.semesters?.name || ''}: ${s.name}` }
+        department_id: (s.semesters as any)?.departments?.id,
+        department_name: (s.semesters as any)?.departments?.name || 'Unknown',
+        subjects: { name: `${(s.semesters as any)?.departments?.name || ''} - ${(s.semesters as any)?.name || ''}: ${s.name}` }
       }))
       semesterIds = allSubjects.map((s: any) => s.semester_id)
     }
@@ -72,8 +72,8 @@ export default async function AttendancePage() {
             subject_name: s.name,
             semester_id: s.semester_id,
             semester_name: sem?.name || 'Unknown',
-            department_id: sem?.departments?.id,
-            department_name: sem?.departments?.name || 'Unknown',
+            department_id: (sem as any)?.departments?.id,
+            department_name: (sem as any)?.departments?.name || 'Unknown',
             subjects: { name: `${(sem as any)?.departments?.name || ''} - ${(sem as any)?.name || ''}: ${s.name}` }
           }
         })
@@ -102,9 +102,9 @@ export default async function AttendancePage() {
             subject_name: s?.name,
             semester_id: fa.semester_id,
             semester_name: s?.semesters?.name || 'Unknown',
-            department_id: s?.semesters?.departments?.id,
-            department_name: s?.semesters?.departments?.name || 'Unknown',
-            subjects: { name: `${s?.semesters?.departments?.name || ''} - ${s?.semesters?.name || ''}: ${s?.name}` }
+            department_id: (s?.semesters as any)?.departments?.id,
+            department_name: (s?.semesters as any)?.departments?.name || 'Unknown',
+            subjects: { name: `${(s?.semesters as any)?.departments?.name || ''} - ${(s?.semesters as any)?.name || ''}: ${s?.name}` }
           })
         }
       })
@@ -129,9 +129,9 @@ export default async function AttendancePage() {
           subject_name: s?.name,
           semester_id: fa.semester_id,
           semester_name: s?.semesters?.name || 'Unknown',
-          department_id: s?.semesters?.departments?.id,
-          department_name: s?.semesters?.departments?.name || 'Unknown',
-          subjects: { name: `${s?.semesters?.departments?.name || ''} - ${s?.semesters?.name || ''}: ${s?.name}` }
+          department_id: (s?.semesters as any)?.departments?.id,
+          department_name: (s?.semesters as any)?.departments?.name || 'Unknown',
+          subjects: { name: `${(s?.semesters as any)?.departments?.name || ''} - ${(s?.semesters as any)?.name || ''}: ${s?.name}` }
         }
       })
     } else {
