@@ -80,23 +80,32 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
       }
       
       const { data, error } = await supabase
-        .from('faculty_teaching_logs')
+        .from('attendance')
         .select(`
-          time_slot_id,
-          users (email, raw_user_meta_data),
-          subjects!inner (name, semester_id)
+          users (email),
+          subjects!inner (name, semester_id),
+          attendance_hours (time_slot_id)
         `)
         .eq('subjects.semester_id', currentSemesterId)
         .eq('date', date)
         
       if (data && !error) {
-        const hours = data.map((log: any) => {
-          const facultyName = log.users?.raw_user_meta_data?.name || log.users?.email || 'Faculty'
+        const hours: { slotId: number, facultyName: string, subjectName: string }[] = []
+        data.forEach((log: any) => {
+          const facultyName = log.users?.email?.split('@')[0] || 'Faculty'
           const subjectName = log.subjects?.name || 'Subject'
-          return {
-            slotId: log.time_slot_id,
-            facultyName: facultyName,
-            subjectName: subjectName
+          
+          if (log.attendance_hours && Array.isArray(log.attendance_hours)) {
+            log.attendance_hours.forEach((ah: any) => {
+              // Avoid duplicates (multiple students have the same time slot)
+              if (!hours.some(h => h.slotId === ah.time_slot_id && h.subjectName === subjectName)) {
+                hours.push({
+                  slotId: ah.time_slot_id,
+                  facultyName: facultyName,
+                  subjectName: subjectName
+                })
+              }
+            })
           }
         })
         setMarkedHours(hours)
