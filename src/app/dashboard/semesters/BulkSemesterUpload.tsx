@@ -44,16 +44,16 @@ export default function BulkSemesterUpload({ departments }: { departments: any[]
   }
 
   return (
-    <div style={{ marginTop: '1.5rem', padding: '1rem', border: '1px dashed #cbd5e1', borderRadius: '8px', background: '#f8fafc' }}>
-      <h4 style={{ marginBottom: '0.75rem', fontSize: '1rem', fontWeight: 600 }}>Bulk Upload Semesters (CSV/Excel)</h4>
+    <div style={{ marginTop: '1.5rem', padding: '1rem', border: '1px dashed var(--border-dark)', borderRadius: '8px', background: 'var(--bg-canvas)' }}>
+      <h4 style={{ marginBottom: '0.75rem', fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>Bulk Upload Semesters (CSV/Excel)</h4>
       
       <div style={{ marginBottom: '1rem' }}>
-        <label htmlFor="bulk_department_id" style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.875rem' }}>Select Department</label>
+        <label htmlFor="bulk_department_id" style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.875rem', color: 'var(--text-primary)' }}>Select Department</label>
         <select 
           id="bulk_department_id" 
           value={departmentId} 
           onChange={(e) => setDepartmentId(parseInt(e.target.value))}
-          style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #d1d5db' }}
+          style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-dark)', background: 'var(--bg-surface)', color: 'var(--text-primary)' }}
         >
           <option value={0}>Select a Department...</option>
           {departments?.map((dept: any) => (
@@ -62,17 +62,17 @@ export default function BulkSemesterUpload({ departments }: { departments: any[]
         </select>
       </div>
 
-      <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1rem' }}>
-        Columns required: <strong>Name</strong>
+      <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+        Columns required: <strong style={{ color: 'var(--text-primary)' }}>Name</strong>
         <a 
           href={`data:text/csv;charset=utf-8,${encodeURIComponent('Name\nSemester 7\nSemester 8')}`}
           download="sample_semesters.csv"
-          style={{ marginLeft: '1rem', color: '#2563eb', textDecoration: 'underline' }}
+          style={{ marginLeft: '1rem', color: 'var(--brand-primary)', textDecoration: 'underline' }}
         >
           Download Sample CSV
         </a>
       </p>
-      <input type="file" accept=".csv, .xlsx, .xls" onChange={handleFileUpload} disabled={isUploading || !departmentId} />
+      <input type="file" accept=".csv, .xlsx, .xls" onChange={handleFileUpload} disabled={isUploading || !departmentId} style={{ color: 'var(--text-primary)' }} />
       {status && <p style={{ fontSize: '0.875rem', marginTop: '0.75rem', color: '#059669', fontWeight: 500 }}>{status}</p>}
       {!departmentId && <p style={{ fontSize: '0.875rem', marginTop: '0.75rem', color: '#ef4444' }}>Please select a department first before uploading.</p>}
     </div>
