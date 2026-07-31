@@ -68,6 +68,15 @@ export default function TimetableGrid({
 
   return (
     <div className={styles.card} ref={gridRef}>
+      <div className={styles.printHeader}>
+        <img src="/carmel.webp" alt="Carmel Logo" className={styles.printLogo} />
+        <div className={styles.printTitles}>
+          <h2>CARMEL POLYTECHNIC COLLEGE</h2>
+          <h3>Academic Timetable - {semester.departments?.name} ({semester.name})</h3>
+        </div>
+        <img src="/meams-logo-text.webp" alt="MEAMS Logo" className={styles.printLogo} />
+      </div>
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }} className={styles.gridHeader}>
         <h3 style={{ margin: 0, fontSize: '1.25rem' }}>{semester.departments?.name} - {semester.name}</h3>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }} className={styles.gridControls}>
@@ -123,16 +132,16 @@ export default function TimetableGrid({
                           <input type="hidden" name="day_of_week" value={dayOfWeek} />
                           <input type="hidden" name="hour_slot" value={ts.id} />
                           
-                          <select name="subject_id" defaultValue={slot?.subject_id || ""} className={styles.selectSmall} style={{ maxWidth: '120px' }}>
+                          <select name="subject_id" defaultValue={slot?.subject_id || ""} className={styles.selectSmall}>
                             <option value="">- Subject -</option>
                             {subjects.map(sub => (
                               <option key={sub.id} value={sub.id} title={sub.name}>
-                                {sub.code || sub.name.substring(0, 15)}
+                                {sub.name}
                               </option>
                             ))}
                           </select>
                           
-                          <select name="faculty_id" defaultValue={slot?.faculty_id || ""} className={styles.selectSmall} style={{ maxWidth: '120px' }}>
+                          <select name="faculty_id" defaultValue={slot?.faculty_id || ""} className={styles.selectSmall}>
                             <option value="">- Faculty -</option>
                             {faculties.map(fac => (
                               <option key={fac.id} value={fac.id}>{fac.email.split('@')[0]}</option>

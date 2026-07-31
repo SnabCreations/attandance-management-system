@@ -81,9 +81,46 @@
   background-color: var(--brand-primary-hover);
 }
 
-/* Capturing styles for html2canvas */
+.capturing .gridHeader,
 .capturing .gridControls {
   display: none !important;
+}
+
+.printHeader {
+  display: none;
+}
+
+.capturing .printHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #1e293b;
+  padding-bottom: 1rem;
+}
+
+.printLogo {
+  height: 80px;
+  width: auto;
+  object-fit: contain;
+}
+
+.printTitles {
+  text-align: center;
+}
+
+.printTitles h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+  color: #0f172a;
+}
+
+.printTitles h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0;
 }
 
 .capturing .saveBtn {
@@ -97,20 +134,36 @@
   padding: 0;
   text-align: center;
   color: #0f172a;
+  max-width: none !important;
+  width: 100% !important;
+  white-space: normal;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .capturing .table th,
 .capturing .table td {
   border-color: #cbd5e1;
+  padding: 1.5rem 1rem !important;
 }
 
 .capturing .table th {
   background-color: #f1f5f9;
   color: #1e293b;
+  font-size: 1.1rem;
 }
 
 .capturing {
-  padding: 2rem !important;
+  padding: 3rem !important;
   border-radius: 0 !important;
   box-shadow: none !important;
+  width: 1600px !important;
+  background: white !important;
+}
+
+.selectSmall {
+  max-width: 150px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
