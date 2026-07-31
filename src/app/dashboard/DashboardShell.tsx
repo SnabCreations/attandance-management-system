@@ -47,7 +47,7 @@ export default function DashboardShell({
           <div className={styles.pageWrapper}>
             {children}
           </div>
-          <footer className={styles.dashboardFooter} style={{ fontSize: '0.75rem', opacity: 0.5, lineHeight: '1.4' }}>
+          <footer className={styles.dashboardFooter} style={{ fontSize: '0.65rem', lineHeight: '1.4', color: '#f8fafc', fontWeight: 500, paddingBottom: '1rem' }}>
             &copy; 2026 Carmel MEAMS. All Rights Reserved.<br/>
             A Product of Carmel Polytechnic College<br/>
             Designed &amp; Developed by Snab Creations

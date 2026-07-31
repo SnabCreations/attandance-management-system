@@ -12,9 +12,9 @@ export default function SidebarSearch() {
     const sections = document.querySelectorAll('nav div') as NodeListOf<HTMLDivElement>
 
     if (query.trim() === '') {
-      // Show everything
-      links.forEach(link => link.style.display = 'block')
-      sections.forEach(sec => sec.style.display = 'block')
+      // Show everything by removing inline styles
+      links.forEach(link => link.style.display = '')
+      sections.forEach(sec => sec.style.display = '')
       return
     }
 
@@ -23,7 +23,7 @@ export default function SidebarSearch() {
     // Filter links
     links.forEach(link => {
       if (link.textContent?.toLowerCase().includes(lowerQuery)) {
-        link.style.display = 'block'
+        link.style.display = ''
       } else {
         link.style.display = 'none'
       }

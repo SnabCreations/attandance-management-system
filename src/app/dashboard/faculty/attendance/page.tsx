@@ -30,12 +30,16 @@ export default async function AttendancePage() {
   if (isAdmin) {
     const { data: allSubjects } = await adminClient
       .from('subjects')
-      .select('id, name, semester_id, semesters(name, departments(name))')
+      .select('id, name, semester_id, semesters(id, name, departments(id, name))')
     
     if (allSubjects) {
       assignments = allSubjects.map((s: any) => ({
         subject_id: s.id,
+        subject_name: s.name,
         semester_id: s.semester_id,
+        semester_name: s.semesters?.name || 'Unknown',
+        department_id: s.semesters?.departments?.id,
+        department_name: s.semesters?.departments?.name || 'Unknown',
         subjects: { name: `${s.semesters?.departments?.name || ''} - ${s.semesters?.name || ''}: ${s.name}` }
       }))
       semesterIds = allSubjects.map((s: any) => s.semester_id)
@@ -51,7 +55,7 @@ export default async function AttendancePage() {
       
       const { data: assignedSemesters } = await adminClient
         .from('semesters')
-        .select('id, name, departments(name)')
+        .select('id, name, departments(id, name)')
         .in('id', semIds)
 
       if (assignedSemesters && assignedSemesters.length > 0) {
@@ -65,7 +69,11 @@ export default async function AttendancePage() {
           const sem = assignedSemesters.find((x: any) => x.id === s.semester_id)
           return {
             subject_id: s.id,
+            subject_name: s.name,
             semester_id: s.semester_id,
+            semester_name: sem?.name || 'Unknown',
+            department_id: sem?.departments?.id,
+            department_name: sem?.departments?.name || 'Unknown',
             subjects: { name: `${(sem as any)?.departments?.name || ''} - ${(sem as any)?.name || ''}: ${s.name}` }
           }
         })
@@ -80,7 +88,7 @@ export default async function AttendancePage() {
       .select(`
         subject_id,
         semester_id,
-        subjects (name)
+        subjects (id, name, semesters(id, name, departments(id, name)))
       `)
       .eq('faculty_id', user.id)
       
@@ -88,7 +96,16 @@ export default async function AttendancePage() {
       // Merge unique
       facultyAssignments.forEach((fa: any) => {
         if (!assignments.find((a: any) => a.subject_id === fa.subject_id)) {
-          assignments.push(fa)
+          const s = fa.subjects
+          assignments.push({
+            subject_id: fa.subject_id,
+            subject_name: s?.name,
+            semester_id: fa.semester_id,
+            semester_name: s?.semesters?.name || 'Unknown',
+            department_id: s?.semesters?.departments?.id,
+            department_name: s?.semesters?.departments?.name || 'Unknown',
+            subjects: { name: `${s?.semesters?.departments?.name || ''} - ${s?.semesters?.name || ''}: ${s?.name}` }
+          })
         }
       })
       semesterIds = [...new Set([...semesterIds, ...facultyAssignments.map((a: any) => a.semester_id)])]
@@ -100,11 +117,26 @@ export default async function AttendancePage() {
       .select(`
         subject_id,
         semester_id,
-        subjects (name)
+        subjects (id, name, semesters(id, name, departments(id, name)))
       `)
       .eq('faculty_id', user.id)
       
-    assignments = facultyAssignments || []
+    if (facultyAssignments) {
+      assignments = facultyAssignments.map((fa: any) => {
+        const s = fa.subjects
+        return {
+          subject_id: fa.subject_id,
+          subject_name: s?.name,
+          semester_id: fa.semester_id,
+          semester_name: s?.semesters?.name || 'Unknown',
+          department_id: s?.semesters?.departments?.id,
+          department_name: s?.semesters?.departments?.name || 'Unknown',
+          subjects: { name: `${s?.semesters?.departments?.name || ''} - ${s?.semesters?.name || ''}: ${s?.name}` }
+        }
+      })
+    } else {
+      assignments = []
+    }
     semesterIds = assignments.map((a: any) => a.semester_id)
   }
 

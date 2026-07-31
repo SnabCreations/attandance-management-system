@@ -15,16 +15,22 @@ export async function addTimeSlot(formData: FormData) {
   const start_time = formData.get('start_time') as string
   const end_time = formData.get('end_time') as string
   const is_break = formData.get('is_break') === 'true'
+  const semester_id = formData.get('semester_id') as string
 
   if (!name || !start_time || !end_time) return
 
+  const parsedSemesterId = semester_id ? parseInt(semester_id) : null
+
   // Get current max order
-  const { data: maxOrderData } = await supabase
-    .from('time_slots')
-    .select('order_index')
-    .order('order_index', { ascending: false })
-    .limit(1)
-    .single()
+  let query = supabase.from('time_slots').select('order_index').order('order_index', { ascending: false }).limit(1)
+  
+  if (parsedSemesterId) {
+    query = query.eq('semester_id', parsedSemesterId)
+  } else {
+    query = query.is('semester_id', null)
+  }
+
+  const { data: maxOrderData } = await query.single()
     
   const nextOrder = (maxOrderData?.order_index || 0) + 1
 
@@ -33,10 +39,15 @@ export async function addTimeSlot(formData: FormData) {
     start_time,
     end_time,
     is_break,
-    order_index: nextOrder
+    order_index: nextOrder,
+    semester_id: parsedSemesterId
   }])
 
-  revalidatePath('/dashboard/timetables/hours')
+  if (parsedSemesterId) {
+    revalidatePath(`/dashboard/timetables/hours?semester_id=${parsedSemesterId}`)
+  } else {
+    revalidatePath('/dashboard/timetables/hours')
+  }
 }
 
 export async function deleteTimeSlot(formData: FormData) {

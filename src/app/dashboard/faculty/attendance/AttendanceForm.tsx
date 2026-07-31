@@ -8,6 +8,8 @@ import Papa from 'papaparse'
 import { Search, Download, Upload, ArrowUpDown } from 'lucide-react'
 
 export default function AttendanceForm({ assignments, allStudents, timeSlots }: { assignments: any[], allStudents: any[], timeSlots: any[] }) {
+  const [selectedDept, setSelectedDept] = useState('')
+  const [selectedSem, setSelectedSem] = useState('')
   const [selectedSubject, setSelectedSubject] = useState('')
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [isExtra, setIsExtra] = useState(false)
@@ -16,7 +18,7 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
   const [sortOrder, setSortOrder] = useState<'asc'|'desc'>('asc')
   
   const [presentStudents, setPresentStudents] = useState<Set<number>>(new Set())
-  const [markedHours, setMarkedHours] = useState<number[]>([])
+  const [markedHours, setMarkedHours] = useState<{ slotId: number, facultyName: string }[]>([])
 
   const supabase = createClient()
 
@@ -26,9 +28,28 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
     ? allStudents.filter(s => s.semester_id === currentAssignment.semester_id)
     : []
 
+  // Unique departments from assignments
+  const departments = Array.from(new Map(assignments.map(a => [a.department_id, { id: a.department_id, name: a.department_name }])).values())
+  
+  // Unique semesters based on selected dept
+  let semesters = Array.from(new Map(assignments.map(a => [a.semester_id, { id: a.semester_id, name: a.semester_name, department_id: a.department_id }])).values())
+  if (selectedDept) {
+    semesters = semesters.filter((s: any) => s.department_id === parseInt(selectedDept))
+  }
+
+  // Filtered assignments based on dept and sem
+  let filteredAssignments = assignments
+  if (selectedDept) filteredAssignments = filteredAssignments.filter(a => a.department_id === parseInt(selectedDept))
+  if (selectedSem) filteredAssignments = filteredAssignments.filter(a => a.semester_id === parseInt(selectedSem))
+
   useEffect(() => {
     setPresentStudents(new Set())
   }, [selectedSubject])
+
+  // Reset subject when dept or sem changes
+  useEffect(() => {
+    setSelectedSubject('')
+  }, [selectedDept, selectedSem])
 
   useEffect(() => {
     async function fetchMarkedHours() {
@@ -38,22 +59,23 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
       }
       
       const { data, error } = await supabase
-        .from('attendance')
+        .from('faculty_teaching_logs')
         .select(`
-          id,
-          attendance_hours (time_slot_id)
+          time_slot_id,
+          users (email, raw_user_meta_data)
         `)
         .eq('subject_id', parseInt(selectedSubject))
         .eq('date', date)
         
       if (data && !error) {
-        const hours = new Set<number>()
-        data.forEach((att: any) => {
-          att.attendance_hours?.forEach((ah: any) => {
-            hours.add(ah.time_slot_id)
-          })
+        const hours = data.map((log: any) => {
+          const facultyName = log.users?.raw_user_meta_data?.name || log.users?.email || 'Faculty'
+          return {
+            slotId: log.time_slot_id,
+            facultyName: facultyName
+          }
         })
-        setMarkedHours(Array.from(hours))
+        setMarkedHours(hours)
       }
     }
     fetchMarkedHours()
@@ -68,7 +90,12 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
     setDate(new Date().toISOString().split('T')[0])
   }
 
-  const classHours = timeSlots.filter(t => !t.is_break)
+  // Filter class hours using fallback logic (semester-specific, or global)
+  const allClassHours = timeSlots.filter(t => !t.is_break)
+  let classHours = allClassHours.filter(t => t.semester_id === currentAssignment?.semester_id)
+  if (classHours.length === 0) {
+    classHours = allClassHours.filter(t => t.semester_id === null)
+  }
 
   const handleMarkAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
@@ -134,6 +161,36 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
     <form action={handleSubmit} className={styles.form}>
       <div className={styles.headerControls}>
         <div className={styles.inputGroup}>
+          <label htmlFor="dept_id">Department</label>
+          <select 
+            id="dept_id" 
+            className={styles.select}
+            value={selectedDept}
+            onChange={(e) => setSelectedDept(e.target.value)}
+          >
+            <option value="">All Departments</option>
+            {departments.map((d: any) => d.id && (
+              <option key={d.id} value={d.id}>{d.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label htmlFor="sem_id">Semester</label>
+          <select 
+            id="sem_id" 
+            className={styles.select}
+            value={selectedSem}
+            onChange={(e) => setSelectedSem(e.target.value)}
+          >
+            <option value="">All Semesters</option>
+            {semesters.map((s: any) => s.id && (
+              <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className={styles.inputGroup}>
           <label htmlFor="subject_id">Subject</label>
           <select 
             id="subject_id" 
@@ -144,7 +201,7 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
             onChange={(e) => setSelectedSubject(e.target.value)}
           >
             <option value="">Select a Subject...</option>
-            {assignments.map((a: any) => (
+            {filteredAssignments.map((a: any) => (
               <option key={a.subject_id} value={a.subject_id}>
                 {a.subjects?.name}
               </option>
@@ -169,13 +226,20 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
           <label>Select Time Slots (Hours Taught)</label>
           <div className={styles.timeSlotGrid}>
             {classHours.map(slot => {
-              const isMarked = markedHours.includes(slot.id)
+              const markedBy = markedHours.filter(m => m.slotId === slot.id)
+              const isMarked = markedBy.length > 0
+              
               return (
                 <label key={slot.id} className={`${styles.timeSlotCard} ${isMarked ? styles.timeSlotCardMarked : ''}`}>
                   <input type="checkbox" name="time_slots" value={slot.id} />
                   <div className={styles.timeSlotContent}>
-                    <span className={styles.timeSlotName}>{slot.name} {isMarked && '(Logged)'}</span>
+                    <span className={styles.timeSlotName}>{slot.name}</span>
                     <span className={styles.timeSlotTime}>{slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)}</span>
+                    {isMarked && (
+                      <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
+                        Marked by: {markedBy.map(m => m.facultyName).join(', ')}
+                      </span>
+                    )}
                   </div>
                 </label>
               )

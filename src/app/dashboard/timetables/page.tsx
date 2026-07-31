@@ -90,6 +90,12 @@ export default async function TimetablesPage({ searchParams }: { searchParams: P
         const semesterSlots = timetables?.filter(t => t.semester_id === semester.id) || []
         const semesterSubjects = subjects?.filter(s => s.semester_id === semester.id) || []
         
+        // Custom hours fallback logic
+        let customTimeSlots = timeSlots?.filter((t: any) => t.semester_id === semester.id) || []
+        if (customTimeSlots.length === 0) {
+          customTimeSlots = timeSlots?.filter((t: any) => t.semester_id === null) || []
+        }
+        
         return (
           <TimetableGrid 
             key={semester.id} 
@@ -97,7 +103,7 @@ export default async function TimetablesPage({ searchParams }: { searchParams: P
             slots={semesterSlots} 
             faculties={faculties || []}
             subjects={semesterSubjects}
-            timeSlots={timeSlots || []}
+            timeSlots={customTimeSlots}
           />
         )
       })}

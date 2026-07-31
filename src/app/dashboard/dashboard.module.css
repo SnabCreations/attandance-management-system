@@ -180,8 +180,8 @@
   margin-top: 2rem;
   text-align: center;
   font-size: 0.75rem;
-  opacity: 0.6;
-  color: var(--text-muted);
+  position: relative;
+  z-index: 10;
 }
 
 .dashboardFooter span {
