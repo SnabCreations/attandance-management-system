@@ -51,9 +51,11 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
     setSelectedSubject('')
   }, [selectedDept, selectedSem])
 
+  const currentSemesterId = selectedSem ? parseInt(selectedSem) : currentAssignment?.semester_id
+
   useEffect(() => {
     async function fetchMarkedHours() {
-      if (!currentAssignment || !date) {
+      if (!currentSemesterId || !date) {
         setMarkedHours([])
         return
       }
@@ -65,7 +67,7 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
           users (email, raw_user_meta_data),
           subjects!inner (name, semester_id)
         `)
-        .eq('subjects.semester_id', currentAssignment.semester_id)
+        .eq('subjects.semester_id', currentSemesterId)
         .eq('date', date)
         
       if (data && !error) {
@@ -82,7 +84,7 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
       }
     }
     fetchMarkedHours()
-  }, [selectedSubject, date, currentAssignment])
+  }, [currentSemesterId, date])
 
   async function handleSubmit(formData: FormData) {
     setIsPending(true)
@@ -95,7 +97,7 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
 
   // Filter class hours using fallback logic (semester-specific, or global)
   const allClassHours = timeSlots.filter(t => !t.is_break)
-  let classHours = allClassHours.filter(t => t.semester_id === currentAssignment?.semester_id)
+  let classHours = allClassHours.filter(t => t.semester_id === currentSemesterId)
   if (classHours.length === 0) {
     classHours = allClassHours.filter(t => t.semester_id === null)
   }
