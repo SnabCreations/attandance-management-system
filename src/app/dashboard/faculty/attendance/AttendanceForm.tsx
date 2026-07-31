@@ -16,6 +16,7 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
   const [isPending, setIsPending] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [sortOrder, setSortOrder] = useState<'asc'|'desc'>('asc')
+  const [refreshKey, setRefreshKey] = useState(0)
   
   const [presentStudents, setPresentStudents] = useState<Set<number>>(new Set())
   const [markedHours, setMarkedHours] = useState<{ slotId: number, facultyName: string, subjectName: string }[]>([])
@@ -42,14 +43,32 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
   if (selectedDept) filteredAssignments = filteredAssignments.filter(a => a.department_id === parseInt(selectedDept))
   if (selectedSem) filteredAssignments = filteredAssignments.filter(a => a.semester_id === parseInt(selectedSem))
 
+  // Initialize defaults on first load
+  useEffect(() => {
+    if (assignments.length > 0 && !selectedDept && !selectedSem && !selectedSubject) {
+      const first = assignments[0]
+      setSelectedDept(first.department_id.toString())
+      setSelectedSem(first.semester_id.toString())
+      setSelectedSubject(first.subject_id.toString())
+    }
+  }, [assignments])
+
   useEffect(() => {
     setPresentStudents(new Set())
-  }, [selectedSubject])
+  }, [selectedSubject, date]) // Clear when subject or date changes before fetch
 
-  // Reset subject when dept or sem changes
+  // Reset subject when dept or sem changes, only if mismatch
   useEffect(() => {
-    setSelectedSubject('')
-  }, [selectedDept, selectedSem])
+    if (selectedSubject) {
+      const subj = assignments.find(a => a.subject_id.toString() === selectedSubject)
+      if (subj) {
+        if ((selectedDept && subj.department_id.toString() !== selectedDept) || 
+            (selectedSem && subj.semester_id.toString() !== selectedSem)) {
+          setSelectedSubject('')
+        }
+      }
+    }
+  }, [selectedDept, selectedSem, assignments, selectedSubject])
 
   const currentSemesterId = selectedSem ? parseInt(selectedSem) : currentAssignment?.semester_id
 
@@ -83,16 +102,32 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
         setMarkedHours(hours)
       }
     }
+
+    async function fetchExistingStudentAttendance() {
+      if (!selectedSubject || !date) return
+      
+      const { data, error } = await supabase
+        .from('attendance')
+        .select('student_id, status')
+        .eq('subject_id', parseInt(selectedSubject))
+        .eq('date', date)
+        
+      if (data && !error && data.length > 0) {
+        const presentIds = new Set(data.filter((r: any) => r.status === 'Present').map((r: any) => r.student_id))
+        setPresentStudents(presentIds)
+      }
+    }
+
     fetchMarkedHours()
-  }, [currentSemesterId, date])
+    fetchExistingStudentAttendance()
+  }, [currentSemesterId, selectedSubject, date, refreshKey])
 
   async function handleSubmit(formData: FormData) {
     setIsPending(true)
     await submitAttendance(formData, currentStudents)
     setIsPending(false)
     alert('Attendance logged successfully!')
-    setMarkedHours([])
-    setDate(new Date().toISOString().split('T')[0])
+    setRefreshKey(r => r + 1)
   }
 
   // Filter class hours using fallback logic (semester-specific, or global)
