@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { submitAttendance } from './actions'
+import { submitAttendance, deleteAttendanceHour } from './actions'
 import styles from './attendance.module.css'
 import { createClient } from '@/utils/supabase/client'
 import Papa from 'papaparse'
-import { Search, Download, Upload, ArrowUpDown } from 'lucide-react'
+import { Search, Download, Upload, ArrowUpDown, Trash2 } from 'lucide-react'
 
 export default function AttendanceForm({ assignments, allStudents, timeSlots }: { assignments: any[], allStudents: any[], timeSlots: any[] }) {
   const [selectedDept, setSelectedDept] = useState('')
@@ -17,11 +17,16 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
   const [searchQuery, setSearchQuery] = useState('')
   const [sortOrder, setSortOrder] = useState<'asc'|'desc'>('asc')
   const [refreshKey, setRefreshKey] = useState(0)
+  const [currentUser, setCurrentUser] = useState<any>(null)
   
   const [presentStudents, setPresentStudents] = useState<Set<number>>(new Set())
-  const [markedHours, setMarkedHours] = useState<{ slotId: number, facultyName: string, subjectName: string }[]>([])
+  const [markedHours, setMarkedHours] = useState<{ slotId: number, facultyName: string, subjectName: string, markedBy: string }[]>([])
 
   const supabase = createClient()
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setCurrentUser(data.user))
+  }, [])
 
   const currentAssignment = assignments.find(a => a.subject_id.toString() === selectedSubject)
   
@@ -82,6 +87,7 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
       const { data, error } = await supabase
         .from('attendance')
         .select(`
+          marked_by,
           users (email),
           subjects!inner (name, semester_id),
           attendance_hours (time_slot_id)
@@ -90,10 +96,11 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
         .eq('date', date)
         
       if (data && !error) {
-        const hours: { slotId: number, facultyName: string, subjectName: string }[] = []
+        const hours: { slotId: number, facultyName: string, subjectName: string, markedBy: string }[] = []
         data.forEach((log: any) => {
           const facultyName = log.users?.email?.split('@')[0] || 'Faculty'
           const subjectName = log.subjects?.name || 'Subject'
+          const markedBy = log.marked_by
           
           if (log.attendance_hours && Array.isArray(log.attendance_hours)) {
             log.attendance_hours.forEach((ah: any) => {
@@ -102,7 +109,8 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
                 hours.push({
                   slotId: ah.time_slot_id,
                   facultyName: facultyName,
-                  subjectName: subjectName
+                  subjectName: subjectName,
+                  markedBy: markedBy
                 })
               }
             })
@@ -137,6 +145,20 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
     setIsPending(false)
     alert('Attendance logged successfully!')
     setRefreshKey(r => r + 1)
+  }
+
+  const handleDeleteHour = async (e: React.MouseEvent, slotId: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!selectedSubject || !date) return
+    
+    if (confirm("Are you sure you want to delete the attendance for this hour?")) {
+      setIsPending(true)
+      await deleteAttendanceHour(parseInt(selectedSubject), date, slotId)
+      setIsPending(false)
+      alert("Attendance hour deleted.")
+      setRefreshKey(r => r + 1)
+    }
   }
 
   // Filter class hours using fallback logic (semester-specific, or global)
@@ -285,9 +307,31 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
                     <span className={styles.timeSlotName}>{slot.name}</span>
                     <span className={styles.timeSlotTime}>{slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)}</span>
                     {isMarked && (
-                      <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block', lineHeight: 1.2 }}>
-                        Marked by: {markedBy.map(m => `${m.facultyName} (${m.subjectName})`).join(', ')}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.25rem' }}>
+                        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block', lineHeight: 1.2 }}>
+                          Marked by: {markedBy.map(m => `${m.facultyName} (${m.subjectName})`).join(', ')}
+                        </span>
+                        {markedBy.some(m => m.markedBy === currentUser?.id) && (
+                          <button 
+                            type="button" 
+                            onClick={(e) => handleDeleteHour(e, slot.id)}
+                            style={{ 
+                              background: 'transparent', 
+                              border: 'none', 
+                              color: 'var(--brand-danger)', 
+                              cursor: 'pointer',
+                              padding: '2px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              opacity: 0.8
+                            }}
+                            title="Delete this hour's attendance"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
                 </label>
