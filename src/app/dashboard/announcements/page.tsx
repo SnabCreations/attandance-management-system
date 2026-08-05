@@ -20,6 +20,26 @@ export default async function AnnouncementsPage() {
     .select('id, title, content, created_at, target_audience')
     .order('created_at', { ascending: false })
 
+  let availableSemesters: any[] = []
+  if (roles.includes('Admin')) {
+    const { data } = await adminSupabase.from('semesters').select('id, name, departments(name)').order('department_id')
+    availableSemesters = data || []
+  } else if (roles.includes('Tutor') || roles.includes('Faculty')) {
+    const semIds = new Set<number>()
+    if (roles.includes('Tutor')) {
+      const { data: tutorSems } = await adminSupabase.from('semester_tutors').select('semester_id').eq('tutor_id', user.id)
+      tutorSems?.forEach(s => semIds.add(s.semester_id))
+    }
+    if (roles.includes('Faculty')) {
+      const { data: facSems } = await adminSupabase.from('faculty_subjects').select('semester_id').eq('faculty_id', user.id)
+      facSems?.forEach(s => semIds.add(s.semester_id))
+    }
+    if (semIds.size > 0) {
+      const { data } = await adminSupabase.from('semesters').select('id, name, departments(name)').in('id', Array.from(semIds))
+      availableSemesters = data || []
+    }
+  }
+
   return (
     <div className={styles.container}>
       {isManager && (
@@ -59,12 +79,11 @@ export default async function AnnouncementsPage() {
                 style={{ padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '8px', backgroundColor: 'white' }}
               >
                 <option value="all">Public (Everyone / Landing Page)</option>
-                <option value="Semester 1">Semester 1 (Private)</option>
-                <option value="Semester 2">Semester 2 (Private)</option>
-                <option value="Semester 3">Semester 3 (Private)</option>
-                <option value="Semester 4">Semester 4 (Private)</option>
-                <option value="Semester 5">Semester 5 (Private)</option>
-                <option value="Semester 6">Semester 6 (Private)</option>
+                {availableSemesters.map(sem => (
+                  <option key={sem.id} value={`${sem.departments?.name} - ${sem.name}`}>
+                    {sem.departments?.name} - {sem.name} (Private)
+                  </option>
+                ))}
               </select>
             </div>
 

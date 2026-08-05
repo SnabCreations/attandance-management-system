@@ -3,6 +3,7 @@ import styles from './semesters.module.css'
 import { addSemester } from './actions'
 import PromoteForm from './PromoteForm'
 import BulkSemesterUpload from './BulkSemesterUpload'
+import SemesterList from './SemesterList'
 
 export default async function SemestersPage() {
   const supabase = await createClient()
@@ -37,13 +38,12 @@ export default async function SemestersPage() {
         <form action={addSemester} className={styles.form}>
           <div className={styles.inputGroup}>
             <label htmlFor="name">Semester Name</label>
-            <input 
-              id="name" 
-              name="name" 
-              type="text" 
-              placeholder="e.g. Semester 1" 
-              required 
-            />
+            <select id="name" name="name" required className={styles.select}>
+              <option value="">Select Semester...</option>
+              {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
+                <option key={num} value={`Semester ${num}`}>Semester {num}</option>
+              ))}
+            </select>
           </div>
           
           <div className={styles.inputGroup}>
@@ -79,40 +79,7 @@ export default async function SemestersPage() {
 
       <div className={styles.card}>
         <h2>Existing Semesters</h2>
-        {semesters && semesters.length > 0 ? (
-          <ul className={styles.list}>
-            {semesters.map((sem: any) => (
-              <li key={sem.id} className={styles.listItem}>
-                <div className={styles.semInfo}>
-                  <span className={styles.semName}>{sem.name}</span>
-                  <span className={styles.deptBadge}>{sem.departments?.name}</span>
-                  {sem.semester_tutors && sem.semester_tutors.length > 0 && (
-                    <span className={styles.deptBadge} style={{ backgroundColor: 'var(--accent)', marginLeft: '0.5rem' }}>
-                      Tutors: {sem.semester_tutors.map((st: any) => st.users?.email).filter(Boolean).join(', ')}
-                    </span>
-                  )}
-                </div>
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                  <span className={styles.semId}>ID: {sem.id}</span>
-                  <form action={async () => {
-                    'use server'
-                    const { createAdminClient } = await import('@/utils/supabase/admin')
-                    const adminClient = createAdminClient()
-                    await adminClient.from('semesters').delete().eq('id', sem.id)
-                    const { revalidatePath } = await import('next/cache')
-                    revalidatePath('/dashboard/semesters')
-                  }}>
-                    <button type="submit" style={{ padding: '0.25rem 0.5rem', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}>
-                      Delete
-                    </button>
-                  </form>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className={styles.emptyState}>No semesters found. Add one above!</p>
-        )}
+        <SemesterList semesters={semesters || []} tutors={tutors || []} />
       </div>
 
       <div className={styles.card}>

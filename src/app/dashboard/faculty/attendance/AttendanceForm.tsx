@@ -7,7 +7,7 @@ import { createClient } from '@/utils/supabase/client'
 import Papa from 'papaparse'
 import { Search, Download, Upload, ArrowUpDown, Trash2 } from 'lucide-react'
 
-export default function AttendanceForm({ assignments, allStudents, timeSlots }: { assignments: any[], allStudents: any[], timeSlots: any[] }) {
+export default function AttendanceForm({ assignments, allStudents, timeSlots, canImportExport }: { assignments: any[], allStudents: any[], timeSlots: any[], canImportExport?: boolean }) {
   const [selectedDept, setSelectedDept] = useState('')
   const [selectedSem, setSelectedSem] = useState('')
   const [selectedSubject, setSelectedSubject] = useState('')
@@ -368,15 +368,17 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots }: 
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <div className={styles.csvControls}>
-                <label className={styles.uploadBtn}>
-                  <Upload size={16} /> Import CSV
-                  <input type="file" accept=".csv" style={{ display: 'none' }} onChange={handleCSVUpload} />
-                </label>
-                <button type="button" onClick={downloadSampleCSV} className={styles.downloadBtn}>
-                  <Download size={16} /> Sample CSV
-                </button>
-              </div>
+              {canImportExport !== false && (
+                <div className={styles.csvControls}>
+                  <label className={styles.uploadBtn}>
+                    <Upload size={16} /> Import CSV
+                    <input type="file" accept=".csv" style={{ display: 'none' }} onChange={handleCSVUpload} />
+                  </label>
+                  <button type="button" onClick={downloadSampleCSV} className={styles.downloadBtn}>
+                    <Download size={16} /> Sample CSV
+                  </button>
+                </div>
+              )}
             </div>
           </div>
           

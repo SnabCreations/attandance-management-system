@@ -10,14 +10,17 @@ export async function generateSemesterReport(semesterId: number) {
     .from('students')
     .select('id, name, roll_no')
     .eq('semester_id', semesterId)
-    .order('roll_no')
 
   if (!students) return []
+
+  const sortedStudents = students.sort((a: any, b: any) => 
+    String(a.roll_no).localeCompare(String(b.roll_no), undefined, { numeric: true, sensitivity: 'base' })
+  )
 
   // 2. We need to map over students and calculate their metrics
   // In a massive production app, we would write a PostgreSQL Stored Procedure for this,
   // but mapping in JS is perfectly fine for this scale.
-  const reportData = await Promise.all(students.map(async (student) => {
+  const reportData = await Promise.all(sortedStudents.map(async (student) => {
     
     // Attendance
     const { data: attendance } = await supabase

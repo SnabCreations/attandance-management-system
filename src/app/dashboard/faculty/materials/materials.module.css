@@ -151,9 +151,9 @@
   letter-spacing: 0.05em;
 }
 
-.badgeDocument { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-.badgeVideo { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
-.badgeLink { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+.badgeDocument { background-color: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.3); }
+.badgeVideo { background-color: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); }
+.badgeLink { background-color: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
 
 .subjectBadge {
   align-self: flex-start;

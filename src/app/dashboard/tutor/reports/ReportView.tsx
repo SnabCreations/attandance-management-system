@@ -8,6 +8,37 @@ export default function ReportView({ semesters }: { semesters: any[] }) {
   const [selectedSemester, setSelectedSemester] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [reportData, setReportData] = useState<any[] | null>(null)
+  const [statusFilter, setStatusFilter] = useState('All')
+
+  const filteredData = reportData?.filter(student => {
+    if (statusFilter === 'Low Attendance' && student.attendancePercentage >= 75) return false
+    if (statusFilter === 'Missing Assignments' && student.missingAssignments === 0) return false
+    return true
+  })
+
+  function downloadCSV() {
+    if (!filteredData) return
+    const headers = ['Roll No', 'Student Name', 'Attendance %', 'Avg Marks', 'Missing Assignments', 'Status Alert']
+    const rows = filteredData.map(student => [
+      student.roll_no,
+      student.name,
+      student.attendancePercentage,
+      student.avgMarks,
+      student.missingAssignments,
+      student.attendancePercentage < 75 ? 'Low Attendance' : 'On Track'
+    ])
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + headers.join(",") + "\n"
+      + rows.map(e => e.join(",")).join("\n")
+    
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement("a")
+    link.setAttribute("href", encodedUri)
+    link.setAttribute("download", "class_report.csv")
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault()
@@ -46,8 +77,22 @@ export default function ReportView({ semesters }: { semesters: any[] }) {
 
       {reportData && (
         <div className={styles.reportSection}>
-          {reportData.length === 0 ? (
-            <p className={styles.emptyState}>No students found in this semester batch.</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <label style={{ fontWeight: 600, fontSize: '0.875rem' }}>Filter Status:</label>
+              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className={styles.select} style={{ width: 'auto', padding: '0.375rem 0.75rem' }}>
+                <option value="All">All Students</option>
+                <option value="Low Attendance">Low Attendance (&lt;75%)</option>
+                <option value="Missing Assignments">Missing Assignments</option>
+              </select>
+            </div>
+            <button onClick={downloadCSV} className={styles.button} style={{ padding: '0.5rem 1rem', width: 'auto', backgroundColor: '#10b981' }}>
+              Download CSV
+            </button>
+          </div>
+
+          {!filteredData || filteredData.length === 0 ? (
+            <p className={styles.emptyState}>No students found matching the criteria.</p>
           ) : (
             <div className={styles.tableContainer}>
               <table className={styles.table}>
@@ -62,7 +107,7 @@ export default function ReportView({ semesters }: { semesters: any[] }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {reportData.map(student => {
+                  {filteredData.map(student => {
                     const isLowAttendance = student.attendancePercentage < 75
                     const hasMissing = student.missingAssignments > 0
 

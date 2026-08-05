@@ -10,11 +10,11 @@ export default async function StudentAssignmentsPage() {
 
   const adminClient = createAdminClient()
   
-  // Find all students for this parent
+  // Find all students for this parent OR this student user
   const { data: students } = await adminClient
     .from('students')
     .select('id, name, roll_no, semester_id')
-    .eq('parent_id', user.id)
+    .or(`parent_id.eq.${user.id},user_id.eq.${user.id}`)
 
   const studentIds = students?.map(s => s.id) || []
   

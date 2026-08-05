@@ -10,23 +10,32 @@ export default async function StudentMaterialsPage() {
 
   const adminClient = createAdminClient()
   
-  // Find all students for this parent
+  // Find all students for this parent OR this student user
   const { data: students } = await adminClient
     .from('students')
-    .select('id, name, roll_no, semester_id')
-    .eq('parent_id', user.id)
+    .select('id, name, roll_no, semester_id, semesters!inner(department_id)')
+    .or(`parent_id.eq.${user.id},user_id.eq.${user.id}`)
 
-  const semesterIds = students?.map(s => s.semester_id) || []
-  
+  const departmentIds = Array.from(new Set(students?.map((s: any) => s.semesters?.department_id).filter(Boolean)))
+
   let materials: any[] = []
-  if (semesterIds.length > 0) {
-    const { data: fetchMaterials } = await adminClient
-      .from('study_materials')
-      .select('id, title, content, file_url, created_at, subjects(name)')
-      .in('semester_id', semesterIds)
-      .order('id', { ascending: false })
-      
-    materials = fetchMaterials || []
+  if (departmentIds.length > 0) {
+    const { data: allSems } = await adminClient
+      .from('semesters')
+      .select('id')
+      .in('department_id', departmentIds)
+
+    const allSemIds = allSems?.map(s => s.id) || []
+
+    if (allSemIds.length > 0) {
+      const { data: fetchMaterials } = await adminClient
+        .from('study_materials')
+        .select('id, title, content, file_url, created_at, subjects(name)')
+        .in('semester_id', allSemIds)
+        .order('id', { ascending: false })
+        
+      materials = fetchMaterials || []
+    }
   }
 
   return (

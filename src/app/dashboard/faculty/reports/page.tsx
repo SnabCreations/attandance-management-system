@@ -21,30 +21,31 @@ export default async function FacultyReportsPage({ searchParams }: { searchParam
 
   const adminClient = createAdminClient()
   
-  // Fetch attendance records for this faculty in the selected month
-  const { data: attendanceRecords } = await adminClient
-    .from('attendance')
-    .select('date, hours, subject_id, subjects(name)')
+  // Fetch actual teaching logs for this faculty
+  const { data: teachingLogs } = await adminClient
+    .from('faculty_teaching_logs')
+    .select('date, subject_id, subjects(name)')
     .eq('faculty_id', user.id)
     .gte('date', startDate)
     .lte('date', endDate)
 
-  // Since attendance is recorded per student, we need to find unique sessions.
-  // A unique session is defined by (date, subject_id) combination.
+  // Group by (date, subject_id) to count hours
   const uniqueSessions: Record<string, any> = {}
   let totalHours = 0
 
-  if (attendanceRecords) {
-    attendanceRecords.forEach(record => {
-      const key = `${record.date}_${record.subject_id}`
+  if (teachingLogs) {
+    teachingLogs.forEach(log => {
+      const key = `${log.date}_${log.subject_id}`
       if (!uniqueSessions[key]) {
         uniqueSessions[key] = {
-          date: record.date,
-          subject: (record.subjects as any)?.name,
-          hours: record.hours
+          date: log.date,
+          subject: (log.subjects as any)?.name,
+          hours: 1
         }
-        totalHours += record.hours
+      } else {
+        uniqueSessions[key].hours += 1
       }
+      totalHours += 1
     })
   }
   

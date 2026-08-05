@@ -2,6 +2,7 @@ import { createAdminClient } from '@/utils/supabase/admin'
 import Link from 'next/link'
 import styles from '../page.module.css'
 import { GraduationCap, ClipboardCheck, FileText, Clock } from 'lucide-react'
+import TimetableViewer from './TimetableViewer'
 
 export default async function FacultyPanel({ userId }: { userId: string }) {
   const adminClient = createAdminClient()
@@ -47,6 +48,18 @@ export default async function FacultyPanel({ userId }: { userId: string }) {
   const { data: timeSlots } = await adminClient
     .from('time_slots')
     .select('id, name')
+    .order('order_index')
+
+  const { data: allFacultySlots } = await adminClient
+    .from('timetables')
+    .select('*, subjects(name), users(email, raw_user_meta_data)')
+    .eq('faculty_id', userId)
+
+  const mockSemester = {
+    id: 0,
+    name: "Faculty Schedule",
+    departments: { name: "Personal" }
+  }
 
   return (
     <div className={styles.dashboardSection}>
@@ -99,6 +112,15 @@ export default async function FacultyPanel({ userId }: { userId: string }) {
           </ul>
         </div>
       )}
+
+      <div className={styles.fullWidthCard} style={{ marginTop: '2rem' }}>
+        <h3 className={styles.statTitle} style={{ marginBottom: '1rem' }}>Your Weekly Timetable</h3>
+        <TimetableViewer 
+          semester={mockSemester} 
+          slots={allFacultySlots || []} 
+          timeSlots={timeSlots || []} 
+        />
+      </div>
       
       <div className={styles.buttonGroup}>
         <Link href="/dashboard/faculty/attendance" className={styles.actionButton}>

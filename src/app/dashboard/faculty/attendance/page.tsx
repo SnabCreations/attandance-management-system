@@ -161,6 +161,10 @@ export default async function AttendancePage() {
     .in('semester_id', semesterIds)
     .order('roll_no')
 
+  const sortedStudents = (students || []).sort((a: any, b: any) => 
+    String(a.roll_no).localeCompare(String(b.roll_no), undefined, { numeric: true, sensitivity: 'base' })
+  )
+
   const { data: timeSlots } = await adminClient
     .from('time_slots')
     .select('*')
@@ -174,8 +178,9 @@ export default async function AttendancePage() {
         
         <AttendanceForm 
           assignments={assignments} 
-          allStudents={students || []} 
+          allStudents={sortedStudents} 
           timeSlots={timeSlots || []}
+          canImportExport={isAdmin || isTutor}
         />
       </div>
     </div>

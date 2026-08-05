@@ -25,7 +25,7 @@ export default async function StudyMaterialsPage() {
   const { data: materials } = await adminClient
     .from('study_materials')
     .select('*, subjects(name)')
-    .eq('uploaded_by', user.id)
+    .eq('created_by', user.id)
     .order('created_at', { ascending: false })
 
   return (

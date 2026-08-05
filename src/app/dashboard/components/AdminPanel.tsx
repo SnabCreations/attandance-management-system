@@ -28,7 +28,7 @@ export default async function AdminPanel() {
           <h3 className={styles.statTitle}>Total Students</h3>
           <p className={styles.statNumber}>{studentCount || 0}</p>
         </div>
-        <div className={styles.statCard}>
+        <div className={styles.statCard} title="Total number of users currently holding the Faculty role in the system">
           <h3 className={styles.statTitle}>Total Faculty</h3>
           <p className={styles.statNumber}>{facultyCount || 0}</p>
         </div>

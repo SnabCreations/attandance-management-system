@@ -15,7 +15,7 @@ export default function Greeting({ role = 'User' }: { role?: string }) {
 
   return (
     <div className={styles.greetingContainer} style={{ marginBottom: '2rem' }}>
-      <h1 className={styles.greetingText} style={{ fontSize: '1.75rem', fontWeight: '700' }}>
+      <h1 className={styles.greetingText} style={{ fontSize: '1.75rem', fontWeight: '700', color: 'var(--text-primary)' }}>
         {greeting}, {role} 👋
       </h1>
       <p style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Welcome back! Here's today's overview.</p>

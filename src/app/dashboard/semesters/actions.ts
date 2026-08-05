@@ -105,3 +105,45 @@ export async function promoteSemester(formData: FormData) {
   // We should also revalidate tutor registry since students moved
   revalidatePath('/dashboard/tutor/students')
 }
+
+export async function editSemester(formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  
+  const { data: userProfile } = await supabase.from('users').select('roles').eq('id', user.id).single()
+  if (!userProfile?.roles?.includes('Admin')) return
+  
+  const id = parseInt(formData.get('id') as string)
+  const name = formData.get('name') as string
+  const tutor_ids = formData.getAll('tutor_id') as string[]
+  
+  if (!id || !name) return
+  
+  const { createAdminClient } = await import('@/utils/supabase/admin')
+  const adminClient = createAdminClient()
+
+  await adminClient.from('semesters').update({ name }).eq('id', id)
+  
+  await adminClient.from('semester_tutors').delete().eq('semester_id', id)
+  if (tutor_ids.length > 0) {
+    const tutorInserts = tutor_ids.map(t_id => ({ semester_id: id, tutor_id: t_id }))
+    await adminClient.from('semester_tutors').insert(tutorInserts)
+  }
+  
+  revalidatePath('/dashboard/semesters')
+}
+
+export async function deleteSemester(id: number) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  
+  const { data: userProfile } = await supabase.from('users').select('roles').eq('id', user.id).single()
+  if (!userProfile?.roles?.includes('Admin')) return
+
+  const { createAdminClient } = await import('@/utils/supabase/admin')
+  const adminClient = createAdminClient()
+  await adminClient.from('semesters').delete().eq('id', id)
+  revalidatePath('/dashboard/semesters')
+}

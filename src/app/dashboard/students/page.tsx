@@ -64,10 +64,16 @@ export default async function AdminStudentRegistryPage({
     studentsQuery = studentsQuery.eq('semester_id', parseInt(semester))
   }
 
-  const { count: totalStudents } = await supabase.from('students').select('*', { count: 'exact', head: true })
+  const { data: allStudentsData } = await studentsQuery
   
-  const { data: students } = await studentsQuery.range(from, to)
-  const totalPages = Math.ceil((totalStudents || 0) / pageSize)
+  // Sort numerically
+  const sortedStudents = (allStudentsData || []).sort((a: any, b: any) => 
+    String(a.roll_no).localeCompare(String(b.roll_no), undefined, { numeric: true, sensitivity: 'base' })
+  )
+  
+  const totalStudents = sortedStudents.length
+  const students = sortedStudents.slice(from, to + 1)
+  const totalPages = Math.ceil(totalStudents / pageSize)
 
   const basePath = `?query=${query || ''}&department=${department || ''}&semester=${semester || ''}`
 

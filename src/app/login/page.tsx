@@ -39,12 +39,12 @@ export default async function LoginPage({
         
         <form action={login} className={styles.form}>
           <div className={styles.inputGroup}>
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">Email Address or Username</label>
             <input 
               id="email" 
               name="email" 
-              type="email" 
-              placeholder="you@example.com" 
+              type="text" 
+              placeholder="you@example.com or username@dept26" 
               required 
             />
           </div>
@@ -72,7 +72,7 @@ export default async function LoginPage({
           &copy; 2026 Carmel MEAMS. All Rights Reserved.<br />
           A Product of <a href="https://carmelpoly.in" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>Carmel Polytechnic College</a>.<br/>
           <span style={{ fontSize: '0.75rem', marginTop: '0.5rem', display: 'inline-block', opacity: 0.9 }}>
-            Designed & Developed by <strong>Snab Creations</strong>
+            Designed & Developed by <a href="https://www.snabcreations.com" target="_blank" rel="noopener noreferrer" className="hover:underline"><strong>Snab Creations</strong></a>
           </span>
         </p>
       </div>

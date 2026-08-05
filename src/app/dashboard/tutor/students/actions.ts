@@ -4,6 +4,30 @@ import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
+async function generateUniqueUsername(adminClient: any, name: string, deptCode: string) {
+  const firstName = name.split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g, '')
+  const year = new Date().getFullYear().toString().slice(-2)
+  const baseUsername = `${firstName}@${deptCode.toLowerCase()}${year}`
+  
+  let currentUsername = baseUsername
+  let counter = 1
+  
+  while (true) {
+    const { data: existing } = await adminClient
+      .from('students')
+      .select('id')
+      .eq('username', currentUsername)
+      .single()
+      
+    if (!existing) {
+      return currentUsername
+    }
+    
+    currentUsername = `${firstName}${counter.toString().padStart(2, '0')}@${deptCode.toLowerCase()}${year}`
+    counter++
+  }
+}
+
 export async function addStudentAndParent(formData: FormData) {
   const supabase = await createClient()
   const adminClient = createAdminClient()
@@ -19,6 +43,9 @@ export async function addStudentAndParent(formData: FormData) {
   const [semester_id_str, department_id_str] = semesterCombo.split('_')
   const semester_id = parseInt(semester_id_str)
   const department_id = parseInt(department_id_str)
+
+  const { data: dept } = await adminClient.from('departments').select('code').eq('id', department_id).single()
+  const deptCode = dept?.code || 'dept'
   
   let parent_id = null
 
@@ -83,6 +110,30 @@ export async function addStudentAndParent(formData: FormData) {
     insertData.parent_id = parent_id
   }
 
+  // Generate Username & Create Auth User
+  const username = await generateUniqueUsername(adminClient, student_name, deptCode)
+  const email = `${username}.carmel.in`
+  let user_id = null
+
+  const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+    email: email,
+    password: 'ams@carmel123',
+    email_confirm: true
+  })
+
+  if (authData?.user) {
+    user_id = authData.user.id
+    await adminClient.from('users').insert([{
+      id: user_id,
+      email: email,
+      roles: ['Student'],
+      force_password_reset: true
+    }])
+  }
+
+  insertData.user_id = user_id
+  insertData.username = username
+
   const { error } = await adminClient
     .from('students')
     .insert([insertData])
@@ -101,6 +152,9 @@ export async function bulkUploadStudents(data: any[], semester_id: number, depar
   
   let successCount = 0
   let errorCount = 0
+
+  const { data: dept } = await adminClient.from('departments').select('code').eq('id', department_id).single()
+  const deptCode = dept?.code || 'dept'
 
   for (const row of data) {
     // Row format expected: { "Student Name": "...", "Roll No": "...", "Parent Email": "..." }
@@ -149,6 +203,26 @@ export async function bulkUploadStudents(data: any[], semester_id: number, depar
       }
     }
 
+    const username = await generateUniqueUsername(adminClient, student_name, deptCode)
+    const email = `${username}.carmel.in`
+    let user_id = null
+
+    const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+      email: email,
+      password: 'ams@carmel123',
+      email_confirm: true
+    })
+
+    if (authData?.user) {
+      user_id = authData.user.id
+      await adminClient.from('users').insert([{
+        id: user_id,
+        email: email,
+        roles: ['Student'],
+        force_password_reset: true
+      }])
+    }
+
     const { error: studentError } = await adminClient
       .from('students')
       .insert([{
@@ -156,7 +230,9 @@ export async function bulkUploadStudents(data: any[], semester_id: number, depar
         roll_no: String(roll_no),
         semester_id,
         department_id,
-        parent_id
+        parent_id,
+        user_id,
+        username
       }])
       
     if (studentError) {
@@ -203,4 +279,35 @@ export async function resetParentPassword(parent_id: string) {
   })
   if (error) return { error: error.message }
   return { success: true }
+}
+
+export async function resetStudentPassword(user_id: string) {
+  const adminClient = createAdminClient()
+  const { error } = await adminClient.auth.admin.updateUserById(user_id, {
+    password: 'ams@carmel123'
+  })
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function editStudent(formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  
+  const { data: userProfile } = await supabase.from('users').select('roles').eq('id', user.id).single()
+  if (!userProfile?.roles?.includes('Admin')) return
+  
+  const id = formData.get('id') as string
+  const name = formData.get('name') as string
+  const roll_no = formData.get('roll_no') as string
+  
+  if (!id || !name || !roll_no) return
+  
+  const { createAdminClient } = await import('@/utils/supabase/admin')
+  const adminClient = createAdminClient()
+  
+  await adminClient.from('students').update({ name, roll_no }).eq('id', id)
+  
+  revalidatePath('/dashboard/tutor/students')
 }

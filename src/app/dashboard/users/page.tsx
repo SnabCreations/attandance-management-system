@@ -7,7 +7,15 @@ import ResetPasswordButton from './ResetPasswordButton'
 import styles from './users.module.css'
 import { deleteUser, toggleBlockUser, resetUserPassword } from './actions'
 
-export default async function UsersPage() {
+import Pagination from '../components/Pagination'
+
+export default async function UsersPage(props: { searchParams: Promise<{ query?: string; role?: string; page?: string }> }) {
+  const searchParams = await props.searchParams;
+  const { query, role, page: pageStr } = searchParams;
+  const page = parseInt(pageStr || '1')
+  const pageSize = 15
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -27,11 +35,31 @@ export default async function UsersPage() {
   const { createAdminClient } = await import('@/utils/supabase/admin')
   const adminClient = createAdminClient()
 
-  // Fetch all custom users
-  const { data: dbUsers } = await adminClient
+  // Fetch all custom users with filters
+  let userQuery = adminClient
     .from('users')
     .select('id, email, roles, created_at, avatar_url')
+    
+  if (query) {
+    userQuery = userQuery.ilike('email', `%${query}%`)
+  }
+  if (role) {
+    userQuery = userQuery.contains('roles', [role])
+  }
+
+  // Get count
+  let countQuery = adminClient.from('users').select('*', { count: 'exact', head: true })
+  if (query) countQuery = countQuery.ilike('email', `%${query}%`)
+  if (role) countQuery = countQuery.contains('roles', [role])
+  
+  const { count: totalUsers } = await countQuery
+  const totalPages = Math.ceil((totalUsers || 0) / pageSize)
+
+  const { data: dbUsers } = await userQuery
     .order('created_at', { ascending: false })
+    .range(from, to)
+
+  const basePath = `?query=${query || ''}&role=${role || ''}`
 
   // Fetch all auth users to check ban status
   const { data: authData } = await adminClient.auth.admin.listUsers()
@@ -59,6 +87,22 @@ export default async function UsersPage() {
 
       <div className={styles.card}>
         <h2>Manage Existing Users</h2>
+        
+        <form className={styles.filtersForm} style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <input type="text" name="query" placeholder="Search by email..." defaultValue={query || ''} className={styles.searchInput} style={{ padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', flex: 1, minWidth: '200px' }} />
+          
+          <select name="role" defaultValue={role || ''} className={styles.filterSelect} style={{ padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', minWidth: '150px' }}>
+            <option value="">All Roles</option>
+            <option value="Admin">Admin</option>
+            <option value="Faculty">Faculty</option>
+            <option value="Tutor">Tutor</option>
+            <option value="Parent">Parent</option>
+            <option value="Student">Student</option>
+          </select>
+          
+          <button type="submit" className={styles.filterBtn} style={{ padding: '0.5rem 1rem', backgroundColor: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Filter</button>
+        </form>
+        
         <div className={styles.tableContainer}>
           <table className={styles.table}>
             <thead>
@@ -124,6 +168,7 @@ export default async function UsersPage() {
             </tbody>
           </table>
         </div>
+        <Pagination totalPages={totalPages} currentPage={page} basePath={basePath} />
       </div>
     </div>
   )

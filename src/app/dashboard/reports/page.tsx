@@ -42,7 +42,7 @@ export default async function AdminReportsPage() {
           <div className={styles.value}>{studentCount || 0}</div>
         </div>
         
-        <div className={styles.statCard}>
+        <div className={styles.statCard} title="Total number of users currently holding the Faculty role in the system">
           <h3>Active Faculty</h3>
           <div className={styles.value}>{facultyCount || 0}</div>
         </div>

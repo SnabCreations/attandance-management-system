@@ -70,7 +70,7 @@ export default function DashboardShell({
               A Product of Carmel Polytechnic College
             </div>
             <div style={{ textAlign: 'right' }}>
-              Designed &amp; Developed by Snab Creations
+              Designed &amp; Developed by <a href="https://www.snabcreations.com" target="_blank" rel="noopener noreferrer" className="hover:underline">Snab Creations</a>
             </div>
           </footer>
         </div>

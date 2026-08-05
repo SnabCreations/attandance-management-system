@@ -4,13 +4,8 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
 import DashboardShell from './DashboardShell'
-import SidebarSearch from './components/SidebarSearch'
 import AvatarUpload from './components/AvatarUpload'
-import { 
-  LayoutDashboard, Users, GraduationCap, Megaphone, Clock, BookOpen, 
-  CalendarDays, Settings, LineChart, CheckSquare, FileText, Book, 
-  FileQuestion, Activity, ClipboardList, PenTool 
-} from 'lucide-react'
+import SidebarNav from './components/SidebarNav'
 
 export default async function DashboardLayout({
   children,
@@ -50,75 +45,7 @@ export default async function DashboardLayout({
           <span className={styles.roleBadge}>{roles.join(', ')}</span>
         </div>
         
-        <nav className={styles.sidebarNav}>
-          <SidebarSearch />
-          <Link href="/dashboard" className={styles.navLink}>
-            <LayoutDashboard size={18} /> Dashboard Home
-          </Link>
-          
-          {roles.includes('Admin') && (
-            <>
-              <div className={styles.navSection}>System Administration</div>
-              <Link href="/dashboard/users" className={styles.navLink}><Users size={18} /> User Accounts</Link>
-              <Link href="/dashboard/students" className={styles.navLink}><GraduationCap size={18} /> Student & Parent Registry</Link>
-              <Link href="/dashboard/announcements" className={styles.navLink}><Megaphone size={18} /> Announcements</Link>
-              <Link href="/dashboard/faculty/attendance" className={styles.navLink}><CheckSquare size={18} /> Fallback Attendance</Link>
-              
-              <div className={styles.navSection}>Academic Setup</div>
-              <Link href="/dashboard/departments" className={styles.navLink}><Book size={18} /> Departments</Link>
-              <Link href="/dashboard/semesters" className={styles.navLink}><Clock size={18} /> Semesters</Link>
-              <Link href="/dashboard/subjects" className={styles.navLink}><BookOpen size={18} /> Subjects</Link>
-              <Link href="/dashboard/timetables" className={styles.navLink}><CalendarDays size={18} /> Timetables</Link>
-              <Link href="/dashboard/timetables/hours" className={styles.navLink}><Settings size={18} /> Hours Setup</Link>
-              <Link href="/dashboard/faculty" className={styles.navLink}><PenTool size={18} /> Faculty Management</Link>
-              
-              <div className={styles.navSection}>System Overview</div>
-              <Link href="/dashboard/reports" className={styles.navLink}><LineChart size={18} /> System Reports</Link>
-            </>
-          )}
-
-          {roles.includes('Tutor') && (
-            <>
-              <div className={styles.navSection}>Class Management</div>
-              <Link href="/dashboard/tutor/students" className={styles.navLink}><GraduationCap size={18} /> Student Registry</Link>
-              <Link href="/dashboard/timetables" className={styles.navLink}><CalendarDays size={18} /> Timetables</Link>
-              <Link href="/dashboard/announcements" className={styles.navLink}><Megaphone size={18} /> Announcements</Link>
-              <Link href="/dashboard/faculty/attendance" className={styles.navLink}><CheckSquare size={18} /> Course log</Link>
-              <Link href="/dashboard/tutor/oversight" className={styles.navLink}><Activity size={18} /> Class Oversight</Link>
-              
-              <div className={styles.navSection}>Analytics</div>
-              <Link href="/dashboard/tutor/reports" className={styles.navLink}><LineChart size={18} /> Class Reports</Link>
-            </>
-          )}
-
-          {roles.includes('Faculty') && (
-            <>
-              <div className={styles.navSection}>Faculty Portal</div>
-              <Link href="/dashboard/faculty/attendance" className={styles.navLink}><CheckSquare size={18} /> Course log</Link>
-              <Link href="/dashboard/faculty/assignments" className={styles.navLink}><ClipboardList size={18} /> Assignments</Link>
-              <Link href="/dashboard/faculty/tests" className={styles.navLink}><FileText size={18} /> Tests & Exams</Link>
-              <Link href="/dashboard/faculty/materials" className={styles.navLink}><BookOpen size={18} /> Study Materials</Link>
-              <Link href="/dashboard/faculty/reports" className={styles.navLink}><LineChart size={18} /> My Reports</Link>
-            </>
-          )}
-
-          {roles.includes('Parent') && (
-            <>
-              <div className={styles.navSection}>My Child</div>
-              <Link href="/dashboard/parent" className={styles.navLink}><Activity size={18} /> Performance</Link>
-              <Link href="/dashboard/student/assignments" className={styles.navLink}><ClipboardList size={18} /> Assignments</Link>
-              <Link href="/dashboard/student/tests" className={styles.navLink}><FileText size={18} /> Tests & Exams</Link>
-              <Link href="/dashboard/student/materials" className={styles.navLink}><BookOpen size={18} /> Study Materials</Link>
-              <Link href="/dashboard/announcements" className={styles.navLink}><Megaphone size={18} /> Announcements</Link>
-            </>
-          )}
-
-          <div className={styles.navSection}>Resources</div>
-          <Link href="/dashboard/question-papers" className={styles.navLink}><FileQuestion size={18} /> Question Papers</Link>
-
-          <div className={styles.navSection}>Personal Space</div>
-          <Link href="/dashboard/notes" className={styles.navLink}><PenTool size={18} /> My Notes</Link>
-        </nav>
+        <SidebarNav roles={roles} />
 
         <div className={styles.sidebarFooter}>
           <AvatarUpload userId={user.id} initialAvatarUrl={userProfile?.avatar_url || null} />

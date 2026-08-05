@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { updateTimetableSlot } from './actions'
+import { saveAllTimetableSlots } from './actions'
 import BulkUploadTimetable from './BulkUploadTimetable'
 import styles from './timetables.module.css'
 import html2canvas from 'html2canvas'
@@ -28,12 +28,37 @@ export default function TimetableGrid({
   subjects: any[]
   timeSlots?: any[]
 }) {
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-  // fallback to generic hours if no time_slots passed
+  const days = ['I', 'II', 'III', 'IV', 'V']
   const hours = timeSlots ? timeSlots : Array.from({length: 7}, (_, i) => ({ id: i+1, name: `Hour ${i+1}`, is_break: false, order_index: i+1 }))
 
   const gridRef = useRef<HTMLDivElement>(null)
   const [isDownloading, setIsDownloading] = useState(false)
+  
+  // Initialize local state with passed slots
+  const [localSlots, setLocalSlots] = useState<TimetableSlot[]>(slots || [])
+  const [isSaving, setIsSaving] = useState(false)
+  
+  const handleSlotChange = (day: number, hour: number, field: 'subject_id' | 'faculty_id', value: string) => {
+    setLocalSlots(prev => {
+      const existing = prev.find(s => s.day_of_week === day && s.hour_slot === hour)
+      if (existing) {
+        return prev.map(s => s.day_of_week === day && s.hour_slot === hour ? { ...s, [field]: value } : s)
+      } else {
+        return [...prev, { id: '', day_of_week: day, hour_slot: hour, subject_id: field === 'subject_id' ? Number(value) : 0, faculty_id: field === 'faculty_id' ? value : '' }]
+      }
+    })
+  }
+
+  const handleSaveAll = async () => {
+    setIsSaving(true)
+    const result = await saveAllTimetableSlots(semester.id, localSlots)
+    setIsSaving(false)
+    if (result?.error) {
+      alert(result.error)
+    } else {
+      alert('Timetable saved successfully!')
+    }
+  }
 
   const downloadImage = async () => {
     if (!gridRef.current) return
@@ -63,7 +88,7 @@ export default function TimetableGrid({
   }
 
   const getSlot = (day: number, hour: number) => {
-    return slots.find(s => s.day_of_week === day && s.hour_slot === hour)
+    return localSlots.find(s => s.day_of_week === day && s.hour_slot === hour)
   }
 
   return (
@@ -102,6 +127,23 @@ export default function TimetableGrid({
           >
             <ImageDown size={16} /> {isDownloading ? 'Saving...' : 'Save as Image'}
           </button>
+          <button 
+            onClick={handleSaveAll}
+            disabled={isSaving}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: 'var(--primary-color)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              cursor: isSaving ? 'not-allowed' : 'pointer',
+              opacity: isSaving ? 0.7 : 1
+            }}
+          >
+            {isSaving ? 'Saving...' : 'Save All Changes'}
+          </button>
         </div>
       </div>
       <div className={styles.tableContainer}>
@@ -127,12 +169,12 @@ export default function TimetableGrid({
                     const slot = getSlot(dayOfWeek, ts.id)
                     return (
                       <td key={ts.id}>
-                        <form action={updateTimetableSlot} className={styles.cellForm}>
-                          <input type="hidden" name="semester_id" value={semester.id} />
-                          <input type="hidden" name="day_of_week" value={dayOfWeek} />
-                          <input type="hidden" name="hour_slot" value={ts.id} />
-                          
-                          <select name="subject_id" defaultValue={slot?.subject_id || ""} className={styles.selectSmall}>
+                        <div className={styles.cellForm}>
+                          <select 
+                            value={slot?.subject_id || ""} 
+                            onChange={(e) => handleSlotChange(dayOfWeek, ts.id, 'subject_id', e.target.value)}
+                            className={styles.selectSmall}
+                          >
                             <option value="">- Subject -</option>
                             {subjects.map(sub => (
                               <option key={sub.id} value={sub.id} title={sub.name}>
@@ -141,15 +183,17 @@ export default function TimetableGrid({
                             ))}
                           </select>
                           
-                          <select name="faculty_id" defaultValue={slot?.faculty_id || ""} className={styles.selectSmall}>
+                          <select 
+                            value={slot?.faculty_id || ""} 
+                            onChange={(e) => handleSlotChange(dayOfWeek, ts.id, 'faculty_id', e.target.value)}
+                            className={styles.selectSmall}
+                          >
                             <option value="">- Faculty -</option>
                             {faculties.map(fac => (
                               <option key={fac.id} value={fac.id}>{fac.email.split('@')[0]}</option>
                             ))}
                           </select>
-                          
-                          <button type="submit" className={styles.saveBtn}>Save</button>
-                        </form>
+                        </div>
                       </td>
                     )
                   })}

@@ -136,7 +136,7 @@ export default async function LandingPage() {
           &copy; 2026 Carmel MEAMS. All Rights Reserved.<br />
           A Product of <a href="https://carmelpoly.in" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>Carmel Polytechnic College</a>.<br/>
           <span style={{ fontSize: '0.75rem', marginTop: '0.5rem', display: 'inline-block', opacity: 0.8 }}>
-            Designed & Developed by <strong>Snab Creations</strong>
+            Designed & Developed by <a href="https://www.snabcreations.com" target="_blank" rel="noopener noreferrer" className="hover:underline"><strong>Snab Creations</strong></a>
           </span>
         </p>
       </footer>

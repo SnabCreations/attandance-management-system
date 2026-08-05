@@ -66,6 +66,58 @@ export async function updateTimetableSlot(formData: FormData) {
   revalidatePath('/dashboard/timetables')
 }
 
+export async function saveAllTimetableSlots(semester_id: number, slotsToSave: any[]) {
+  const supabase = await createClient()
+  
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+  
+  const { data: callerProfile } = await supabase
+    .from('users')
+    .select('roles')
+    .eq('id', user.id)
+    .single()
+    
+  if (!callerProfile?.roles?.includes('Admin') && !callerProfile?.roles?.includes('Tutor')) {
+    return { error: 'Unauthorized' }
+  }
+
+  // 1. Delete all existing slots for this semester to clean slate
+  const { error: deleteError } = await supabase
+    .from('timetables')
+    .delete()
+    .eq('semester_id', semester_id)
+
+  if (deleteError) {
+    console.error(deleteError)
+    return { error: 'Failed to reset timetable' }
+  }
+
+  // 2. Insert the non-empty slots
+  const validSlots = slotsToSave.filter(s => s.faculty_id && s.subject_id)
+  
+  if (validSlots.length > 0) {
+    const { error: insertError } = await supabase
+      .from('timetables')
+      .insert(validSlots.map(s => ({
+        semester_id,
+        day_of_week: s.day_of_week,
+        hour_slot: s.hour_slot,
+        faculty_id: s.faculty_id,
+        subject_id: parseInt(s.subject_id)
+      })))
+      
+    if (insertError) {
+      console.error(insertError)
+      return { error: 'Failed to save new timetable' }
+    }
+  }
+
+  revalidatePath('/dashboard/timetables')
+  return { success: true }
+}
+
+
 export async function bulkUploadTimetable(semester_id: number, entries: any[]) {
   const supabase = await createClient()
   

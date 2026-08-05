@@ -3,10 +3,12 @@ import styles from './students.module.css'
 import StudentRegistryForm from './StudentRegistryForm'
 import { deleteStudent } from './actions'
 import Pagination from '../../components/Pagination'
+import StudentTableList from './StudentTableList'
 
-export default async function StudentRegistryPage(props: { searchParams: Promise<{ page?: string }> }) {
+export default async function StudentRegistryPage(props: { searchParams: Promise<{ page?: string; query?: string; semester?: string }> }) {
   const searchParams = await props.searchParams;
-  const page = parseInt(searchParams.page || '1')
+  const { query, semester, page: pageStr } = searchParams;
+  const page = parseInt(pageStr || '1')
   const pageSize = 20
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
@@ -54,6 +56,7 @@ export default async function StudentRegistryPage(props: { searchParams: Promise
       roll_no,
       semesters (name, departments(name)),
       parent_id,
+      user_id,
       parent:users!students_parent_id_fkey (avatar_url)
     `)
     .order('roll_no')
@@ -62,14 +65,26 @@ export default async function StudentRegistryPage(props: { searchParams: Promise
     studentsQuery = studentsQuery.in('semester_id', semesters.map((s: any) => s.id))
   }
 
-  const countQuery = supabase.from('students').select('*', { count: 'exact', head: true })
-  if (!isAdmin && semesters && semesters.length > 0) {
-    countQuery.in('semester_id', semesters.map((s: any) => s.id))
+  if (query) {
+    studentsQuery = studentsQuery.or(`name.ilike.%${query}%,roll_no.ilike.%${query}%`)
   }
-  const { count: totalStudents } = await countQuery
-  const totalPages = Math.ceil((totalStudents || 0) / pageSize)
+  
+  if (semester) {
+    studentsQuery = studentsQuery.eq('semester_id', parseInt(semester))
+  }
 
-  const { data: students } = await studentsQuery.range(from, to)
+  const { data: allStudentsData } = await studentsQuery
+
+  // Sort numerically
+  const sortedStudents = (allStudentsData || []).sort((a: any, b: any) => 
+    String(a.roll_no).localeCompare(String(b.roll_no), undefined, { numeric: true, sensitivity: 'base' })
+  )
+
+  const totalStudents = sortedStudents.length
+  const totalPages = Math.ceil(totalStudents / pageSize)
+  const students = sortedStudents.slice(from, to + 1)
+  
+  const basePath = `?query=${query || ''}&semester=${semester || ''}`
 
   if (!isAdmin && (!semesters || semesters.length === 0)) {
     return (
@@ -88,66 +103,22 @@ export default async function StudentRegistryPage(props: { searchParams: Promise
 
       <div className={styles.card}>
         <h2>Student Registry</h2>
-        <div className={styles.tableContainer}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Roll No</th>
-                <th>Name</th>
-                <th>Department / Semester</th>
-                <th>Parent Linked</th>
-                {isAdmin && <th>Actions</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {students?.map((student: any) => (
-                <tr key={student.id}>
-                  <td className={styles.rollNo}>{student.roll_no}</td>
-                  <td className={styles.studentName}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      {student.parent?.avatar_url ? (
-                        <img src={student.parent.avatar_url} alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
-                      ) : (
-                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
-                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        </div>
-                      )}
-                      <span>{student.name}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span className={styles.badge}>
-                      {student.semesters?.departments?.name} / {student.semesters?.name}
-                    </span>
-                  </td>
-                  <td>
-                    {student.parent_id ? (
-                      <span className={styles.statusLinked}>Yes</span>
-                    ) : (
-                      <span className={styles.statusPending}>Pending</span>
-                    )}
-                  </td>
-                  {isAdmin && (
-                    <td>
-                      <form action={async () => {
-                        'use server'
-                        await deleteStudent(student.id)
-                      }}>
-                        <button type="submit" className={styles.deleteBtn}>
-                          Delete
-                        </button>
-                      </form>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {!students || students.length === 0 && (
-            <p className={styles.emptyState}>No students registered yet.</p>
-          )}
-        </div>
-        <Pagination totalPages={totalPages} currentPage={page} />
+        
+        <form className={styles.filtersForm} style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <input type="text" name="query" placeholder="Search by name or roll no" defaultValue={query || ''} className={styles.searchInput} style={{ padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', flex: 1, minWidth: '200px' }} />
+          
+          <select name="semester" defaultValue={semester || ''} className={styles.filterSelect} style={{ padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', minWidth: '150px' }}>
+            <option value="">All My Semesters</option>
+            {semesters?.map((s: any) => (
+              <option key={s.id} value={s.id}>{s.name} ({s.departments?.name})</option>
+            ))}
+          </select>
+          
+          <button type="submit" className={styles.filterBtn} style={{ padding: '0.5rem 1rem', backgroundColor: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Filter</button>
+        </form>
+
+        <StudentTableList students={students || []} isAdmin={!!isAdmin} />
+        <Pagination totalPages={totalPages} currentPage={page} basePath={basePath} />
       </div>
     </div>
   )

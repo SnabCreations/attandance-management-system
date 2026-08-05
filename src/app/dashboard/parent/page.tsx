@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import styles from './parent.module.css'
+import TimetableViewer from '../components/TimetableViewer'
 
 export default async function ParentPortalPage() {
   const supabase = await createClient()
@@ -17,6 +18,7 @@ export default async function ParentPortalPage() {
       id,
       name,
       roll_no,
+      semester_id,
       semesters (name, departments(name))
     `)
     .eq('parent_id', user.id)
@@ -33,6 +35,12 @@ export default async function ParentPortalPage() {
       </div>
     )
   }
+
+  // Fetch time slots once for all children
+  const { data: timeSlots } = await supabase
+    .from('time_slots')
+    .select('*')
+    .order('order_index')
 
   // Fetch data for each child
   const childrenData = await Promise.all(children.map(async (child) => {
@@ -90,24 +98,25 @@ export default async function ParentPortalPage() {
 
     // 4. Fetch Study Materials for child's semester
     let studyMaterials = []
-    if (child.semesters) {
-      // Find the semester id by looking up the student record
-      const { data: studentRecord } = await supabase
-        .from('students')
-        .select('semester_id')
-        .eq('id', child.id)
-        .single()
+    if (child.semester_id) {
+      const { data: materials } = await supabase
+        .from('study_materials')
+        .select('*, subjects(name)')
+        .eq('semester_id', child.semester_id)
+        .order('created_at', { ascending: false })
         
-      if (studentRecord) {
-        const { data: materials } = await supabase
-          .from('study_materials')
-          .select('*, subjects(name)')
-          .eq('semester_id', studentRecord.semester_id)
-          .order('created_at', { ascending: false })
-          
-        studyMaterials = materials || []
-      }
+      studyMaterials = materials || []
     }
+
+    // 5. Fetch Timetable
+    const { data: timetableSlots } = await supabase
+      .from('timetable_slots')
+      .select(`
+        id, faculty_id, subject_id, day_of_week, hour_slot,
+        subjects(name),
+        users(email)
+      `)
+      .eq('semester_id', child.semester_id || 0)
 
     return {
       ...child,
@@ -119,7 +128,8 @@ export default async function ParentPortalPage() {
       assignments: assignments || [],
       recentAttendance: recentAttendance || [],
       tests: tests || [],
-      studyMaterials
+      studyMaterials,
+      timetableSlots: timetableSlots || []
     }
   }))
 
@@ -327,6 +337,14 @@ export default async function ParentPortalPage() {
             ) : (
               <p className={styles.emptyState}>No attendance logged yet.</p>
             )}
+          </div>
+          
+          <div className={styles.assignmentsCard} style={{ marginTop: '2rem' }}>
+            <TimetableViewer 
+              semester={child.semesters} 
+              slots={child.timetableSlots || []} 
+              timeSlots={timeSlots || undefined} 
+            />
           </div>
         </div>
       ))}

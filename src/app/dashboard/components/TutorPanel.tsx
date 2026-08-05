@@ -2,16 +2,26 @@ import { createAdminClient } from '@/utils/supabase/admin'
 import Link from 'next/link'
 import styles from '../page.module.css'
 import { BookOpen, Users, ClipboardCheck } from 'lucide-react'
+import TimetableViewer from './TimetableViewer'
 
 export default async function TutorPanel({ userId }: { userId: string }) {
   const adminClient = createAdminClient()
   
-  const { data: semesters } = await adminClient
-    .from('semesters')
-    .select('id, name, departments(name)')
+  const { data: assignedSemesters } = await adminClient
+    .from('semester_tutors')
+    .select('semester_id')
     .eq('tutor_id', userId)
-
-  const semesterIds = semesters?.map(s => s.id) || []
+    
+  const semesterIds = assignedSemesters?.map(s => s.semester_id) || []
+  
+  let semesters: any[] = []
+  if (semesterIds.length > 0) {
+    const { data } = await adminClient
+      .from('semesters')
+      .select('id, name, departments(name)')
+      .in('id', semesterIds)
+    semesters = data || []
+  }
   
   let studentCount = 0
   if (semesterIds.length > 0) {
@@ -21,6 +31,19 @@ export default async function TutorPanel({ userId }: { userId: string }) {
       .in('semester_id', semesterIds)
     studentCount = count || 0
   }
+  let timetableSlots = []
+  if (semesterIds.length > 0) {
+    const { data: slots } = await adminClient
+      .from('timetables')
+      .select('*, subjects(name), users(email, raw_user_meta_data)')
+      .eq('semester_id', semesterIds[0])
+    timetableSlots = slots || []
+  }
+
+  const { data: timeSlots } = await adminClient
+    .from('time_slots')
+    .select('*')
+    .order('order_index')
 
   return (
     <div className={styles.dashboardSection}>
@@ -50,6 +73,17 @@ export default async function TutorPanel({ userId }: { userId: string }) {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+      
+      {semesters && semesters.length > 0 && (
+        <div className={styles.fullWidthCard} style={{ marginTop: '2rem' }}>
+          <h3 className={styles.statTitle} style={{ marginBottom: '1rem' }}>Class Timetable</h3>
+          <TimetableViewer 
+            semester={semesters[0]} 
+            slots={timetableSlots} 
+            timeSlots={timeSlots || []} 
+          />
         </div>
       )}
       
