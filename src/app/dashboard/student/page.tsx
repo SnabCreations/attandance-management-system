@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import styles from '../parent/parent.module.css'
 import Link from 'next/link'
 import TimetableViewer from '../components/TimetableViewer'
+import AttendanceGrid from '../components/AttendanceGrid'
 import AvatarUpload from '../components/AvatarUpload'
 
 export default async function StudentDashboardPage() {
@@ -231,57 +232,7 @@ export default async function StudentDashboardPage() {
 
         <div className={styles.assignmentsCard} style={{ marginTop: '2rem' }}>
           <h3>Recent Attendance Logs</h3>
-          {recentAttendance && recentAttendance.length > 0 ? (
-            <div className={styles.tableContainer}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Subject</th>
-                    <th>Status</th>
-                    <th>Timeline (Slots)</th>
-                    <th>Extra?</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentAttendance.map((log: any) => (
-                    <tr key={log.id}>
-                      <td style={{ whiteSpace: 'nowrap' }}>{new Date(log.date).toLocaleDateString()}</td>
-                      <td>{log.subjects?.name}</td>
-                      <td>
-                        <span className={`${styles.badge} ${log.status === 'Present' ? styles.submitted : styles.missing}`}>
-                          {log.status}
-                        </span>
-                      </td>
-                      <td>
-                        {log.attendance_hours && log.attendance_hours.length > 0 ? (
-                          <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
-                            {log.attendance_hours.map((ah: any, idx: number) => (
-                              <span key={idx} style={{ 
-                                backgroundColor: 'var(--bg-canvas)', 
-                                border: '1px solid var(--border-color)', 
-                                padding: '0.125rem 0.375rem', 
-                                borderRadius: '4px', 
-                                fontSize: '0.75rem',
-                                color: 'var(--text-secondary)'
-                              }}>
-                                {ah.time_slots?.name}
-                              </span>
-                            ))}
-                          </div>
-                        ) : (
-                          <span style={{ color: 'var(--muted)', fontSize: '0.875rem' }}>{log.hours} Hrs (Legacy)</span>
-                        )}
-                      </td>
-                      <td>{log.is_extra_hours ? 'Yes' : 'No'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className={styles.emptyState}>No attendance logged yet.</p>
-          )}
+          <AttendanceGrid logs={recentAttendance || []} />
         </div>
 
         <div className={styles.assignmentsCard} style={{ marginTop: '2rem' }}>

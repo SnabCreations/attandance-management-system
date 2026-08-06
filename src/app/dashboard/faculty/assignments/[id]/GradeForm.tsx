@@ -10,7 +10,9 @@ export default function GradeForm({ submissions, assignmentId }: { submissions: 
   const [isPending, setIsPending] = useState(false)
   
   // Convert submissions to local state so CSV can override them
-  const [localSubmissions, setLocalSubmissions] = useState(submissions)
+  const [localSubmissions, setLocalSubmissions] = useState(() => 
+    [...submissions].sort((a, b) => String(a.students?.roll_no).localeCompare(String(b.students?.roll_no), undefined, { numeric: true, sensitivity: 'base' }))
+  )
 
   const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]

@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/utils/supabase/admin'
 import styles from '../page.module.css'
 import { UserCircle2, CalendarDays } from 'lucide-react'
+import AttendanceGrid from './AttendanceGrid'
 
 export default async function ParentPanel({ userId }: { userId: string }) {
   const adminClient = createAdminClient()
@@ -41,7 +42,7 @@ export default async function ParentPanel({ userId }: { userId: string }) {
     
     const { data: attendanceData } = await adminClient
       .from('attendance')
-      .select('id, date, status, hours, subjects(name), students(name)')
+      .select('id, date, status, hours, subjects(name), students(name), attendance_hours(time_slots(name))')
       .in('student_id', studentIds)
       .gte('date', lastWeek.toISOString().split('T')[0])
       .order('date', { ascending: false })
@@ -86,26 +87,7 @@ export default async function ParentPanel({ userId }: { userId: string }) {
           </h3>
           
           <div className={styles.calendarGrid}>
-            {Object.keys(attendanceByDate).length > 0 ? (
-              Object.keys(attendanceByDate).map(dateStr => (
-                <div key={dateStr} className={styles.calendarDayCard}>
-                  <div className={styles.calendarDayHeader}>
-                    {new Date(dateStr).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
-                  </div>
-                  <div className={styles.calendarDayBody}>
-                    {attendanceByDate[dateStr].map((record: any) => (
-                      <div key={record.id} className={`${styles.attendanceHour} ${record.status === 'Present' ? styles.hourPresent : styles.hourAbsent}`}>
-                        <span className={styles.hourSubject}>{record.subjects?.name}</span>
-                        <span className={styles.hourStatus}>{record.status} ({record.hours} hr)</span>
-                        <span className={styles.hourStudent}>{record.students?.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className={styles.itemSubtitle}>No attendance records in the last 7 days.</p>
-            )}
+            <AttendanceGrid logs={recentAttendance} />
           </div>
         </div>
       )}

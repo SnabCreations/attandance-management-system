@@ -1,0 +1,153 @@
+.gridContainer {
+  overflow-x: auto;
+  margin-top: 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.table th, .table td {
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.table th {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+.dateCell {
+  font-weight: 600;
+  color: var(--text-primary);
+  background-color: var(--bg-canvas);
+  white-space: nowrap;
+}
+
+.statusCell {
+  position: relative;
+  border-radius: 4px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  margin: 0 auto;
+  width: fit-content;
+  min-width: 100px;
+  cursor: pointer;
+  transition: transform 0.15s ease-in-out;
+}
+
+.statusCell:hover {
+  transform: scale(1.05);
+}
+
+.present {
+  background-color: #16a34a; /* Tailwind green-600 */
+  color: #ffffff;
+  border: 1px solid #15803d; /* Tailwind green-700 */
+}
+
+.absent {
+  background-color: #dc2626; /* Tailwind red-600 */
+  color: #ffffff;
+  border: 1px solid #b91c1c; /* Tailwind red-700 */
+}
+
+.tooltip {
+  visibility: hidden;
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1e293b;
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #1e293b transparent transparent transparent;
+}
+
+.statusCell:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.emptyCell {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.875rem;
+}
+
+.legend {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--bg-canvas);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.legendDot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+  .statusCell {
+    min-width: unset;
+    padding: 0.25rem;
+    gap: 0;
+  }
+  
+  .statusCell span {
+    display: none;
+  }
+
+  .table th, .table td {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .tooltip {
+    font-size: 0.65rem;
+  }
+}

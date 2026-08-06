@@ -8,7 +8,9 @@ import { Upload, Download } from 'lucide-react'
 
 export default function SpreadsheetGradeForm({ submissions, testId, maxMarks }: { submissions: any[], testId: string, maxMarks: number }) {
   const [isPending, setIsPending] = useState(false)
-  const [localSubmissions, setLocalSubmissions] = useState(submissions)
+  const [localSubmissions, setLocalSubmissions] = useState(() => 
+    [...submissions].sort((a, b) => String(a.students?.roll_no).localeCompare(String(b.students?.roll_no), undefined, { numeric: true, sensitivity: 'base' }))
+  )
 
   const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
