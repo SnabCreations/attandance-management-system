@@ -25,7 +25,17 @@ export default async function DepartmentsPage() {
               required 
             />
           </div>
-          <button type="submit" className={styles.button}>
+          <div className={styles.inputGroup} style={{ marginTop: '1rem' }}>
+            <label htmlFor="code">Department Code</label>
+            <input 
+              id="code" 
+              name="code" 
+              type="text" 
+              placeholder="e.g. cs" 
+              required 
+            />
+          </div>
+          <button type="submit" className={styles.button} style={{ marginTop: '1rem' }}>
             Create Department
           </button>
         </form>
@@ -38,7 +48,10 @@ export default async function DepartmentsPage() {
             {departments.map((dept) => (
               <li key={dept.id} className={styles.listItem}>
                 <span className={styles.deptName}>{dept.name}</span>
-                <span className={styles.deptId}>ID: {dept.id}</span>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                  <span className={styles.deptId}>Code: {dept.code || 'N/A'}</span>
+                  <span className={styles.deptId}>ID: {dept.id}</span>
+                </div>
               </li>
             ))}
           </ul>

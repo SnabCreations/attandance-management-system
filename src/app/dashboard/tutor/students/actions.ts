@@ -5,9 +5,10 @@ import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
 async function generateUniqueUsername(adminClient: any, name: string, deptCode: string) {
-  const firstName = name.split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g, '')
+  // Convert "Pranav P" to "pranav.p"
+  const formattedName = name.trim().toLowerCase().replace(/\s+/g, '.').replace(/[^a-z0-9.]/g, '')
   const year = new Date().getFullYear().toString().slice(-2)
-  const baseUsername = `${firstName}@${deptCode.toLowerCase()}${year}`
+  const baseUsername = `${formattedName}@${deptCode.toLowerCase()}${year}`
   
   let currentUsername = baseUsername
   let counter = 1
@@ -23,7 +24,7 @@ async function generateUniqueUsername(adminClient: any, name: string, deptCode: 
       return currentUsername
     }
     
-    currentUsername = `${firstName}${counter.toString().padStart(2, '0')}@${deptCode.toLowerCase()}${year}`
+    currentUsername = `${formattedName}${counter.toString().padStart(2, '0')}@${deptCode.toLowerCase()}${year}`
     counter++
   }
 }
@@ -34,6 +35,7 @@ export async function addStudentAndParent(formData: FormData) {
   
   const student_name = formData.get('student_name') as string
   const roll_no = formData.get('roll_no') as string
+  const student_username = formData.get('student_username') as string
   const semesterCombo = formData.get('semester_id') as string // Contains "semesterId_departmentId"
   
   const parent_email = formData.get('parent_email') as string
@@ -111,7 +113,9 @@ export async function addStudentAndParent(formData: FormData) {
   }
 
   // Generate Username & Create Auth User
-  const username = await generateUniqueUsername(adminClient, student_name, deptCode)
+  const username = student_username && student_username.trim() !== '' 
+    ? student_username.trim().toLowerCase().replace(/[^a-z0-9@_.-]/g, '')
+    : await generateUniqueUsername(adminClient, student_name, deptCode)
   const email = `${username}.carmel.in`
   let user_id = null
 
@@ -157,10 +161,11 @@ export async function bulkUploadStudents(data: any[], semester_id: number, depar
   const deptCode = dept?.code || 'dept'
 
   for (const row of data) {
-    // Row format expected: { "Student Name": "...", "Roll No": "...", "Parent Email": "..." }
+    // Row format expected: { "Student Name": "...", "Roll No": "...", "Parent Email": "...", "Student ID": "..." }
     const student_name = row['Student Name'] || row['student_name'] || row['name']
     const roll_no = row['Roll No'] || row['roll_no']
     const parent_email = row['Parent Email'] || row['parent_email']
+    const custom_username = row['Student ID'] || row['student_id'] || row['Username'] || row['username']
 
     if (!student_name || !roll_no) {
       errorCount++
@@ -203,7 +208,9 @@ export async function bulkUploadStudents(data: any[], semester_id: number, depar
       }
     }
 
-    const username = await generateUniqueUsername(adminClient, student_name, deptCode)
+    const username = custom_username && String(custom_username).trim() !== ''
+      ? String(custom_username).trim().toLowerCase().replace(/[^a-z0-9@_.-]/g, '')
+      : await generateUniqueUsername(adminClient, student_name, deptCode)
     const email = `${username}.carmel.in`
     let user_id = null
 

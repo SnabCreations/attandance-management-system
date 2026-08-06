@@ -82,9 +82,9 @@ export default function StudentRegistryForm({ semesters }: { semesters: any[] })
           <div className={styles.inputGroup} style={{ marginTop: '1rem' }}>
             <label>Upload Excel File</label>
             <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem' }}>
-              Format: Columns should be named "Student Name", "Roll No", "Parent Email" (optional). 
+              Format: Columns should be named "Student Name", "Roll No", "Parent Email" (optional), "Student ID" (optional). 
               <a 
-                href={`data:text/csv;charset=utf-8,${encodeURIComponent('Student Name,Roll No,Parent Email\nJohn Doe,ME101,parent1@example.com\nJane Smith,ME102,parent2@example.com')}`}
+                href={`data:text/csv;charset=utf-8,${encodeURIComponent('Student Name,Roll No,Parent Email,Student ID\nJohn Doe,ME101,parent1@example.com,johndoe_me\nJane Smith,ME102,parent2@example.com,')}`}
                 download="sample_students.csv"
                 style={{ marginLeft: '0.5rem', color: '#2563eb', textDecoration: 'underline' }}
               >
@@ -144,6 +144,14 @@ export default function StudentRegistryForm({ semesters }: { semesters: any[] })
               <input id="parent_email" name="parent_email" type="email" placeholder="e.g. parent@example.com" />
               <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>
                 If this email is not linked to a user, a new account will be created with password 'ams@carmel123'.
+              </p>
+            </div>
+            
+            <div className={styles.inputGroup}>
+              <label htmlFor="student_username">Student ID / Username (Optional)</label>
+              <input id="student_username" name="student_username" type="text" placeholder="e.g. john2024" />
+              <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>
+                Leave blank to auto-generate based on name and department.
               </p>
             </div>
           </div>
