@@ -3,7 +3,8 @@ import Link from 'next/link'
 import styles from '../tests.module.css'
 import SpreadsheetGradeForm from './SpreadsheetGradeForm'
 
-export default async function TestDetailsPage({ params }: { params: { id: string } }) {
+export default async function TestDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const supabase = await createClient()
 
   // 1. Fetch the Test details

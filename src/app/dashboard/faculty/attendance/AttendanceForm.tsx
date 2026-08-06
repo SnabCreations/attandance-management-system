@@ -224,8 +224,8 @@ export default function AttendanceForm({ assignments, allStudents, timeSlots, ca
   const filteredAndSortedStudents = currentStudents
     .filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.roll_no.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => {
-      if (sortOrder === 'asc') return a.roll_no.localeCompare(b.roll_no)
-      return b.roll_no.localeCompare(a.roll_no)
+      const cmp = String(a.roll_no).localeCompare(String(b.roll_no), undefined, { numeric: true, sensitivity: 'base' })
+      return sortOrder === 'asc' ? cmp : -cmp
     })
 
   return (

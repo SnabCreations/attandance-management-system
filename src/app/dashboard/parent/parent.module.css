@@ -20,9 +20,9 @@
 }
 
 .profileCard {
-  background-color: var(--bg-card);
+  background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 2rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   display: flex;
@@ -207,10 +207,10 @@
 }
 
 .assignmentsCard {
-  background-color: var(--bg-card);
+  background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  padding: 2rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 

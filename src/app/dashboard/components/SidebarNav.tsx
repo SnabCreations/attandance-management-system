@@ -38,7 +38,7 @@ export default function SidebarNav({ roles }: { roles: string[] }) {
           <NavLink href="/dashboard/users"><Users size={18} /> User Accounts</NavLink>
           <NavLink href="/dashboard/students"><GraduationCap size={18} /> Student & Parent Registry</NavLink>
           <NavLink href="/dashboard/announcements"><Megaphone size={18} /> Announcements</NavLink>
-          <NavLink href="/dashboard/faculty/attendance"><CheckSquare size={18} /> Fallback Attendance</NavLink>
+          <NavLink href="/dashboard/faculty/attendance"><CheckSquare size={18} /> Admin Attendance</NavLink>
           
           <div className={styles.navSection}>Academic Setup</div>
           <NavLink href="/dashboard/departments"><Book size={18} /> Departments</NavLink>

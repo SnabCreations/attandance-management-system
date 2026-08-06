@@ -3,7 +3,8 @@ import Link from 'next/link'
 import styles from '../assignments.module.css'
 import GradeForm from './GradeForm'
 
-export default async function AssignmentDetailsPage({ params }: { params: { id: string } }) {
+export default async function AssignmentDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const supabase = await createClient()
 
   const { createAdminClient } = await import('@/utils/supabase/admin')

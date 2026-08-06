@@ -44,12 +44,32 @@ export async function bulkAddSubjects(data: any[], semester_id: number) {
   return { count: inserts.length }
 }
 
-export async function editSubject(id: number, name: string, code: string) {
+export async function editSubject(id: number, name: string, code: string, facultyId: string | null) {
   const supabase = await createClient()
   if (!id || !name) return
   
   const { error } = await supabase.from('subjects').update({ name, code }).eq('id', id)
   if (error) console.error('Error updating subject:', error)
+  
+  const { createAdminClient } = await import('@/utils/supabase/admin')
+  const adminClient = createAdminClient()
+  
+  if (facultyId) {
+    // Check if subject has an existing assignment
+    const { data: existing } = await adminClient.from('faculty_subjects').select('id').eq('subject_id', id).single()
+    if (existing) {
+      await adminClient.from('faculty_subjects').update({ faculty_id: facultyId }).eq('subject_id', id)
+    } else {
+      // Get semester_id of this subject
+      const { data: sub } = await adminClient.from('subjects').select('semester_id').eq('id', id).single()
+      if (sub?.semester_id) {
+        await adminClient.from('faculty_subjects').insert({ subject_id: id, faculty_id: facultyId, semester_id: sub.semester_id })
+      }
+    }
+  } else {
+    // Remove any existing assignment if facultyId is null or empty
+    await adminClient.from('faculty_subjects').delete().eq('subject_id', id)
+  }
   
   revalidatePath('/dashboard/subjects')
 }

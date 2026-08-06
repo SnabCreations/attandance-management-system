@@ -26,6 +26,22 @@ export default async function SubjectsPage() {
     `)
     .order('id')
 
+  const { createAdminClient } = await import('@/utils/supabase/admin')
+  const adminClient = createAdminClient()
+
+  // Fetch all faculty subjects to map assignments
+  const { data: facultySubjects } = await adminClient
+    .from('faculty_subjects')
+    .select('*')
+
+  // Fetch all faculty users
+  const { data: allUsers } = await adminClient
+    .from('users')
+    .select('id, email, roles')
+    .contains('roles', ['Faculty'])
+
+  const facultyMembers = allUsers || []
+
   // Group subjects by semester
   const groupedSubjects = subjects?.reduce((acc: any, sub: any) => {
     const semKey = `${sub.semesters?.departments?.name} - ${sub.semesters?.name}`
@@ -91,9 +107,17 @@ export default async function SubjectsPage() {
               <div key={semesterName} className={styles.semesterGroup}>
                 <h3 className={styles.semesterTitle}>{semesterName}</h3>
                 <ul className={styles.list}>
-                  {groupedSubjects[semesterName].map((sub: any) => (
-                    <SubjectRow key={sub.id} sub={sub} />
-                  ))}
+                  {groupedSubjects[semesterName].map((sub: any) => {
+                    const assignment = facultySubjects?.find(fa => fa.subject_id === sub.id)
+                    return (
+                      <SubjectRow 
+                        key={sub.id} 
+                        sub={sub} 
+                        facultyMembers={facultyMembers} 
+                        assignedFacultyId={assignment?.faculty_id} 
+                      />
+                    )
+                  })}
                 </ul>
               </div>
             ))}

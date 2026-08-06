@@ -143,7 +143,7 @@ export default function StudentRegistryForm({ semesters }: { semesters: any[] })
               <label htmlFor="parent_email">Parent Email (Optional)</label>
               <input id="parent_email" name="parent_email" type="email" placeholder="e.g. parent@example.com" />
               <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>
-                If this email is not linked to a user, a new account will be created with password 'Meams@123'.
+                If this email is not linked to a user, a new account will be created with password 'ams@carmel123'.
               </p>
             </div>
           </div>

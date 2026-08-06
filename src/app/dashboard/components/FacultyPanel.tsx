@@ -11,7 +11,7 @@ export default async function FacultyPanel({ userId }: { userId: string }) {
     .from('faculty_subjects')
     .select(`
       subject_id,
-      subjects (name),
+      subjects (name, code),
       semesters (name, departments(name))
     `)
     .eq('faculty_id', userId)
@@ -71,6 +71,27 @@ export default async function FacultyPanel({ userId }: { userId: string }) {
           <p className={styles.statNumber}>{assignments?.length || 0}</p>
         </div>
       </div>
+      
+      {assignments && assignments.length > 0 && (
+        <div className={styles.fullWidthCard} style={{ marginTop: '2rem' }}>
+          <h3 className={styles.statTitle} style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <FileText size={18} /> Assigned Subjects
+          </h3>
+          <ul className={styles.list}>
+            {assignments.map((a: any) => (
+              <li key={a.subject_id} className={styles.listItem}>
+                <div>
+                  <span className={styles.itemTitle}>{a.subjects?.name}</span>
+                  <div className={styles.itemSubtitle}>{a.subjects?.code}</div>
+                </div>
+                <span className={styles.badge}>
+                  {a.semesters?.departments?.name} / {a.semesters?.name}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       
       {upcomingClasses && upcomingClasses.length > 0 && (
         <div className={styles.fullWidthCard} style={{ marginTop: '2rem' }}>

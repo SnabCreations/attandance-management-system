@@ -9,9 +9,9 @@ import { deleteUser, toggleBlockUser, resetUserPassword } from './actions'
 
 import Pagination from '../components/Pagination'
 
-export default async function UsersPage(props: { searchParams: Promise<{ query?: string; role?: string; page?: string }> }) {
+export default async function UsersPage(props: { searchParams: Promise<{ query?: string; role?: string; semester?: string; page?: string }> }) {
   const searchParams = await props.searchParams;
-  const { query, role, page: pageStr } = searchParams;
+  const { query, role, semester, page: pageStr } = searchParams;
   const page = parseInt(pageStr || '1')
   const pageSize = 15
   const from = (page - 1) * pageSize
@@ -40,17 +40,42 @@ export default async function UsersPage(props: { searchParams: Promise<{ query?:
     .from('users')
     .select('id, email, roles, created_at, avatar_url')
     
+  let filterUserIds: string[] | null = null;
+  if (semester) {
+    const semId = parseInt(semester)
+    const { data: students } = await adminClient.from('students').select('user_id, parent_id').eq('semester_id', semId)
+    const { data: tutors } = await adminClient.from('semester_tutors').select('tutor_id').eq('semester_id', semId)
+    const { data: facSubs } = await adminClient.from('faculty_subjects').select('faculty_id').eq('semester_id', semId)
+
+    const validIds = new Set<string>()
+    students?.forEach(s => {
+      if (s.user_id) validIds.add(s.user_id)
+      if (s.parent_id) validIds.add(s.parent_id)
+    })
+    tutors?.forEach(t => t.tutor_id && validIds.add(t.tutor_id))
+    facSubs?.forEach(f => f.faculty_id && validIds.add(f.faculty_id))
+    
+    filterUserIds = Array.from(validIds)
+    if (filterUserIds.length === 0) {
+      filterUserIds = ['00000000-0000-0000-0000-000000000000']
+    }
+  }
+
   if (query) {
     userQuery = userQuery.ilike('email', `%${query}%`)
   }
   if (role) {
     userQuery = userQuery.contains('roles', [role])
   }
+  if (filterUserIds) {
+    userQuery = userQuery.in('id', filterUserIds)
+  }
 
   // Get count
   let countQuery = adminClient.from('users').select('*', { count: 'exact', head: true })
   if (query) countQuery = countQuery.ilike('email', `%${query}%`)
   if (role) countQuery = countQuery.contains('roles', [role])
+  if (filterUserIds) countQuery = countQuery.in('id', filterUserIds)
   
   const { count: totalUsers } = await countQuery
   const totalPages = Math.ceil((totalUsers || 0) / pageSize)
@@ -59,7 +84,13 @@ export default async function UsersPage(props: { searchParams: Promise<{ query?:
     .order('created_at', { ascending: false })
     .range(from, to)
 
-  const basePath = `?query=${query || ''}&role=${role || ''}`
+  const basePath = `?query=${query || ''}&role=${role || ''}&semester=${semester || ''}`
+
+  // Fetch all semesters for the dropdown
+  const { data: allSemesters } = await adminClient
+    .from('semesters')
+    .select('id, name, departments(name)')
+    .order('department_id')
 
   // Fetch all auth users to check ban status
   const { data: authData } = await adminClient.auth.admin.listUsers()
@@ -98,6 +129,15 @@ export default async function UsersPage(props: { searchParams: Promise<{ query?:
             <option value="Tutor">Tutor</option>
             <option value="Parent">Parent</option>
             <option value="Student">Student</option>
+          </select>
+          
+          <select name="semester" defaultValue={semester || ''} className={styles.filterSelect} style={{ padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', minWidth: '150px' }}>
+            <option value="">All Semesters</option>
+            {allSemesters?.map((sem: any) => (
+              <option key={sem.id} value={sem.id}>
+                {sem.departments?.name} - {sem.name}
+              </option>
+            ))}
           </select>
           
           <button type="submit" className={styles.filterBtn} style={{ padding: '0.5rem 1rem', backgroundColor: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Filter</button>

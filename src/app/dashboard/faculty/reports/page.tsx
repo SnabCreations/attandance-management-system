@@ -50,6 +50,13 @@ export default async function FacultyReportsPage({ searchParams }: { searchParam
   }
   
   const sessionList = Object.values(uniqueSessions).sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    return new Date(dateStr).toLocaleDateString('en-GB').replace(/\//g, '-');
+  };
 
   return (
     <div className={styles.container}>
@@ -90,12 +97,12 @@ export default async function FacultyReportsPage({ searchParams }: { searchParam
           <div className={styles.statCard}>
             <h3 className={styles.statTitle}>Total Hours Taught</h3>
             <p className={styles.statNumber} style={{ fontSize: '2.5rem', color: 'var(--accent)' }}>{totalHours}</p>
-            <p className={styles.itemSubtitle}>From {startDate} to {endDate}</p>
+            <p className={styles.itemSubtitle}>From {formatDate(startDate)} to {formatDate(endDate)}</p>
           </div>
           <div className={styles.statCard}>
             <h3 className={styles.statTitle}>Total Sessions</h3>
             <p className={styles.statNumber} style={{ fontSize: '2.5rem' }}>{sessionList.length}</p>
-            <p className={styles.itemSubtitle}>From {startDate} to {endDate}</p>
+            <p className={styles.itemSubtitle}>From {formatDate(startDate)} to {formatDate(endDate)}</p>
           </div>
         </div>
 
@@ -116,7 +123,7 @@ export default async function FacultyReportsPage({ searchParams }: { searchParam
             <tbody>
               {sessionList.map((session: any, index: number) => (
                 <tr key={index} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                  <td style={{ padding: '0.75rem', fontWeight: 500 }}>{new Date(session.date).toLocaleDateString()}</td>
+                  <td style={{ padding: '0.75rem', fontWeight: 500 }}>{formatDate(session.date)}</td>
                   <td style={{ padding: '0.75rem' }}>{session.subject}</td>
                   <td style={{ padding: '0.75rem' }}>{session.hours}</td>
                 </tr>
