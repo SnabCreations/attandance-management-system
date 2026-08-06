@@ -8,7 +8,7 @@
 }
 
 .table {
-  width: 100%;
+  width: max-content;
   border-collapse: collapse;
   min-width: 600px;
 }
