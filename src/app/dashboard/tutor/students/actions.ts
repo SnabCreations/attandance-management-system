@@ -5,10 +5,9 @@ import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
 async function generateUniqueUsername(adminClient: any, name: string, deptCode: string) {
-  // Convert "Pranav P" to "pranav.p"
   const formattedName = name.trim().toLowerCase().replace(/\s+/g, '.').replace(/[^a-z0-9.]/g, '')
   const year = new Date().getFullYear().toString().slice(-2)
-  const baseUsername = `${formattedName}@${deptCode.toLowerCase()}${year}`
+  const baseUsername = `${formattedName}@${year}.${deptCode.toLowerCase()}`
   
   let currentUsername = baseUsername
   let counter = 1
@@ -24,7 +23,7 @@ async function generateUniqueUsername(adminClient: any, name: string, deptCode: 
       return currentUsername
     }
     
-    currentUsername = `${formattedName}${counter.toString().padStart(2, '0')}@${deptCode.toLowerCase()}${year}`
+    currentUsername = `${formattedName}${counter.toString().padStart(2, '0')}@${year}.${deptCode.toLowerCase()}`
     counter++
   }
 }
@@ -113,10 +112,18 @@ export async function addStudentAndParent(formData: FormData) {
   }
 
   // Generate Username & Create Auth User
-  const username = student_username && student_username.trim() !== '' 
+  let username = student_username && student_username.trim() !== '' 
     ? student_username.trim().toLowerCase().replace(/[^a-z0-9@_.-]/g, '')
     : await generateUniqueUsername(adminClient, student_name, deptCode)
-  const email = `${username}.carmel.in`
+    
+  // Ensure it's a valid email format for Supabase (if custom ID was provided poorly)
+  if (!username.includes('@')) {
+    username = `${username}@student.local`
+  } else if (!username.split('@')[1].includes('.')) {
+    username = `${username}.local`
+  }
+    
+  const email = username
   let user_id = null
 
   const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
@@ -208,10 +215,18 @@ export async function bulkUploadStudents(data: any[], semester_id: number, depar
       }
     }
 
-    const username = custom_username && String(custom_username).trim() !== ''
+    let username = custom_username && String(custom_username).trim() !== ''
       ? String(custom_username).trim().toLowerCase().replace(/[^a-z0-9@_.-]/g, '')
       : await generateUniqueUsername(adminClient, student_name, deptCode)
-    const email = `${username}.carmel.in`
+      
+    // Ensure it's a valid email format for Supabase (if custom ID was provided poorly)
+    if (!username.includes('@')) {
+      username = `${username}@student.local`
+    } else if (!username.split('@')[1].includes('.')) {
+      username = `${username}.local`
+    }
+      
+    const email = username
     let user_id = null
 
     const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
